@@ -1,14 +1,7 @@
-# Recetario Flask
 
-## Descripción
-Este proyecto es una aplicación web para gestionar un recetario, construida con Flask. Permite crear, editar y listar recetas, ingredientes y métodos de preparación. También ofrece la posibilidad de gestionar cartas (por ejemplo, "Carta de Verano 2025").
+# Recetario App
 
-El proyecto está configurado para ejecutarse en un contenedor Docker, lo que facilita su despliegue y testeo en cualquier entorno compatible con Docker.
-
-## Tecnologías
-- **Flask**: Framework web ligero para Python.
-- **Docker**: Contenedores para la gestión y ejecución de la app.
-- **SQLite**: Base de datos ligera para almacenamiento de recetas e ingredientes.
+Una aplicación de recetas donde los usuarios pueden consultar, agregar, editar y eliminar recetas. Además, es posible gestionar diferentes cartas de menús.
 
 ## Estructura de directorios
 
@@ -25,26 +18,41 @@ El proyecto está configurado para ejecutarse en un contenedor Docker, lo que fa
 
 ## Requisitos
 
-1. **Docker** y **Docker Compose** instalados.
-2. **Python 3.7+** (si deseas correr la aplicación fuera de Docker).
+- Python 3.7 o superior
+- Docker y Docker Compose instalados
+- Git
 
-### Instalación
+## Instalación
 
-### 1. Clonar el repositorio
+1. **Clonar el repositorio**
+```bash
 git clone https://github.com/gabofunebre/recetario.git
 cd recetario
+```
 
-### 2. Construir y levantar los contenedores
+2. **Instalar las dependencias**
+```bash
+pip install -r requirements.txt
+```
+
+## Uso
+
+### 1. Levantar la aplicación
+Construye y levanta los contenedores Docker con el siguiente comando:
+
+```bash
 make up
+```
 
-### 3. Acceder a la aplicación
+### 2. Acceder a la aplicación
 Abre tu navegador y ve a `http://localhost:1881` para acceder a la aplicación en tu contenedor Docker.
 
-### 4. Realizar migraciones de base de datos (si es necesario)
+### 3. Realizar migraciones de base de datos (si es necesario)
+```bash
 make migrate
+```
 
-
-### Comandos útiles en el Makefile
+## Comandos útiles en el Makefile
 
 - **make up**: Construye y levanta los contenedores en segundo plano.
 - **make down**: Detiene y elimina los contenedores y volúmenes.
@@ -58,4 +66,3 @@ make migrate
 ## Contribuciones
 
 Si deseas contribuir al proyecto, por favor realiza un fork del repositorio, haz tus cambios y envía un pull request.
-
