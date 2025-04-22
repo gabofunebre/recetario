@@ -1,9 +1,9 @@
 const buscador = document.getElementById("buscador");
 const resultados = document.getElementById("resultados");
 
-// Función para obtener recetas desde la API
-function obtenerRecetas() {
-    return fetch("/api/recetas")
+// Función para obtener recetas desde la API de búsqueda
+function obtenerRecetas(query) {
+    return fetch(`/buscar_recetas?q=${query}`)
         .then(response => response.json())
         .catch(error => console.error("Error al obtener las recetas:", error));
 }
@@ -16,7 +16,7 @@ function mostrarResultados(filtradas) {
         filtradas.forEach(receta => {
             const div = document.createElement("div");
             div.className = "resultado";
-            div.innerText = receta.nombre;  // Puedes mostrar más detalles si lo deseas
+            div.innerText = receta.nombre;  // Mostrar solo el nombre de la receta
             div.onclick = () => window.location.href = `/receta/${receta.id}`;
             resultados.appendChild(div);
         });
@@ -25,33 +25,23 @@ function mostrarResultados(filtradas) {
     }
 }
 
-// Función para buscar recetas
-function buscarRecetas(query) {
-    obtenerRecetas().then(recetas => {
-        const filtradas = recetas.filter(r =>
-            r.nombre.toLowerCase().includes(query) || r.descripcion.toLowerCase().includes(query)
-        );
-        mostrarResultados(filtradas);
-    });
-}
-
 // Escuchar el input del campo de búsqueda
 buscador.addEventListener("input", function () {
-    const query = this.value.toLowerCase();
+    const query = this.value.trim();  // Obtener valor de búsqueda sin espacios innecesarios
     
     if (query.length > 0) {
         // Filtrar recetas
-        buscarRecetas(query);
+        obtenerRecetas(query).then(filtradas => mostrarResultados(filtradas));
     } else {
-        // Si el campo está vacío, mostrar todas las recetas
-        obtenerRecetas().then(recetas => mostrarResultados(recetas));
+        // Si el campo está vacío, no mostrar resultados
+        resultados.innerHTML = "";
     }
 });
 
 // Si presionas Enter, buscar también
 buscador.addEventListener("keyup", function (e) {
     if (e.key === "Enter") {
-        const query = this.value.toLowerCase();
-        buscarRecetas(query);
+        const query = this.value.trim();
+        obtenerRecetas(query).then(filtradas => mostrarResultados(filtradas));
     }
 });

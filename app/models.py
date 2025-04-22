@@ -1,5 +1,5 @@
 from datetime import datetime
-from . import db  # Importa la instancia de db de __init__.py
+from . import db  # Importa la instancia de db desde __init__.py
 
 class Carta(db.Model):
     __tablename__ = 'cartas'
@@ -37,4 +37,3 @@ class Ingrediente(db.Model):
     nombre = db.Column(db.String(100), nullable=False)
     cantidad = db.Column(db.String(50))
     receta_id = db.Column(db.Integer, db.ForeignKey('recetas.id'), nullable=False)
-    

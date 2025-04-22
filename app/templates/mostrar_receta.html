@@ -4,20 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ receta.nombre }}</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
 </head>
 <body>
-    <h1>{{ receta.nombre }}</h1>
-    <p><strong>Autor:</strong> {{ receta.autor }}</p>
-    <p><strong>Metodo:</strong> {{ receta.metodo }}</p>
+    <div class="receta-container">
+        <h1>{{ receta.nombre }}</h1>
+        <p><strong>Autor:</strong> {{ receta.autor }}</p>
+        <p><strong>Método:</strong> {{ receta.metodo }}</p>
 
-    <h3>Ingredientes:</h3>
-    <ul>
-        {% for ingrediente in ingredientes %}
-            <li>{{ ingrediente.nombre }} ({{ ingrediente.cantidad }})</li>
-        {% endfor %}
-    </ul>
+        <h3>Ingredientes:</h3>
+        <ul>
+            {% for ingrediente in ingredientes %}
+                <li>{{ ingrediente.nombre }} ({{ ingrediente.cantidad }})</li>
+            {% endfor %}
+        </ul>
 
-    <button onclick="window.history.back()">Volver</button>
+        <button class="volver-btn" onclick="window.history.back()">← Volver</button>
+    </div>
+
+    <script src="/static/js/scripts.js"></script>
 </body>
 </html>
-

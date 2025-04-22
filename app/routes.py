@@ -6,7 +6,6 @@ from datetime import datetime
 # Crea el blueprint para las rutas principales
 main = Blueprint('main', __name__)
 
-
 @main.route('/')
 def index():
     return render_template('index.html')
@@ -73,6 +72,7 @@ def crear_plato(carta_id):
         return redirect(url_for('main.cartas'))  # Redirige a la lista de cartas
     return render_template('crear_plato.html', carta=carta)
 
+# Ruta para crear una receta
 @main.route('/crear_receta', methods=['GET', 'POST'])
 def crear_receta():
     if request.method == 'POST':
@@ -80,19 +80,20 @@ def crear_receta():
         autor = request.form['autor']
         metodo = request.form['metodo']
         
-        # Asegúrate de que los datos no estén vacíos
+        # Validar que los campos no estén vacíos
         if not nombre or not autor or not metodo:
-            return "Por favor, complete todos los campos", 400  # Error si algún campo está vacío
+            return render_template('crear_receta_independiente.html', error="Por favor, complete todos los campos.")
         
+        # Crear la nueva receta
         receta = Receta(nombre=nombre, autor=autor, metodo=metodo)
         db.session.add(receta)
         db.session.commit()
 
-        return redirect(url_for('main.cartas'))  # Redirige a la lista de cartas
+        # Redirigir a la lista de recetas o cartas, según lo que desees
+        return redirect(url_for('main.cartas'))  # O puedes redirigir a otra vista si prefieres
 
-    return render_template('crear_receta_independiente.html')  # Si es GET, muestra el formulario de crear receta
-
-
+    # Si es GET, simplemente muestra el formulario de crear receta
+    return render_template('crear_receta_independiente.html')
 
 # Ruta para crear un ingrediente en una receta específica
 @main.route('/crear_ingrediente/<int:receta_id>', methods=['GET', 'POST'])
@@ -101,8 +102,28 @@ def crear_ingrediente(receta_id):
     if request.method == 'POST':
         nombre = request.form['nombre']
         cantidad = request.form['cantidad']
+        
+        # Validación de los campos
+        if not nombre or not cantidad:
+            return render_template('crear_ingrediente.html', receta=receta, error="Por favor, complete todos los campos.")
+        
+        # Crear el ingrediente
         ingrediente = Ingrediente(nombre=nombre, cantidad=cantidad, receta_id=receta.id)
         db.session.add(ingrediente)
         db.session.commit()
         return redirect(url_for('main.mostrar_receta', id=receta.id))  # Redirige a la receta específica
     return render_template('crear_ingrediente.html', receta=receta)
+
+
+# Ruta para buscar recetas en la base de datos
+@main.route('/buscar_recetas', methods=['GET'])
+def buscar_recetas():
+    query = request.args.get('q', '')  # Obtener la consulta de búsqueda desde los parámetros GET
+    if query:
+        recetas = Receta.query.filter(Receta.nombre.ilike(f'%{query}%')).all()  # Filtrar recetas por nombre
+    else:
+        recetas = []
+
+    # Convertir las recetas a un formato JSON para enviarlas al frontend
+    recetas_json = [{"id": receta.id, "nombre": receta.nombre} for receta in recetas]
+    return jsonify(recetas_json)
