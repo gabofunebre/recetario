@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ carta.nombre if carta else 'Sin carta actual' }}</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    {% if carta %}
+        <h1>{{ carta.nombre }}</h1>
+        <h2>Autor: {{ carta.autor }}</h2>
+
+        <h3>Platos:</h3>
+        <ul>
+            {% for plato in platos %}
+                <li>
+                    <strong>{{ plato.nombre }}</strong> - {{ plato.autor }}<br>
+                    Ingredientes: {{ plato.ingredientes }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No hay una carta actual disponible.</p>
+    {% endif %}
+    <a href="/">← Volver al inicio</a>
+</body>
+</html>

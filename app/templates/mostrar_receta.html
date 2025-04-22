@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ receta.nombre }}</title>
+</head>
+<body>
+    <h1>{{ receta.nombre }}</h1>
+    <p><strong>Autor:</strong> {{ receta.autor }}</p>
+    <p><strong>Metodo:</strong> {{ receta.metodo }}</p>
+
+    <h3>Ingredientes:</h3>
+    <ul>
+        {% for ingrediente in ingredientes %}
+            <li>{{ ingrediente.nombre }} ({{ ingrediente.cantidad }})</li>
+        {% endfor %}
+    </ul>
+
+    <button onclick="window.history.back()">Volver</button>
+</body>
+</html>
+

@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg
+*.egg-info/
+dist/
+build/
+env/
+venv/
+
+# Docker
+*.log
+*.pid
+*.db
+*.sqlite3
+*.sqlite
+.DS_Store
+docker-compose.override.yml
+
+# VSCode
+.vscode/
+
+# Entornos
+.env
+.env.*
+
+# Otros
+*.swp
+.idea/
+*.bak
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Base de datos y volúmenes
+data/
+db/
+volumes/
+instance/
+
+# Archivos de seeds o pruebas si no querés subirlos
+seed.py
+test_*.py

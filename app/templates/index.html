@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recetario</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <h1>Recetario</h1>
+    
+    <!-- Buscador de recetas -->
+    <input type="text" id="buscador" placeholder="Buscar receta...">
+    <div id="resultados"></div>
+
+    <!-- Botones para la carta -->
+    <div>
+        <button onclick="location.href='/carta_actual'">Carta actual</button>
+        <button onclick="location.href='/cartas'">Ver cartas</button>
+    </div>
+
+    <!-- Botón para crear una receta -->
+    <div>
+        <button onclick="location.href='/crear_receta'">Crear nueva receta</button>
+    </div>
+
+    <!-- Enlace al archivo JS -->
+    <script src="/static/js/scripts.js"></script>
+</body>
+</html>

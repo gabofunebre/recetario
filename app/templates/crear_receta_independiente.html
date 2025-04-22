@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Receta</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <h1>Crear Nueva Receta</h1>
+
+    <form method="POST">
+        <label for="nombre">Nombre de la Receta:</label>
+        <input type="text" id="nombre" name="nombre" required><br><br>
+
+        <label for="autor">Autor:</label>
+        <input type="text" id="autor" name="autor" required><br><br>
+
+        <label for="metodo">Método de Preparación:</label>
+        <textarea id="metodo" name="metodo" required></textarea><br><br>
+
+        <button type="submit">Crear Receta</button>
+    </form>
+
+    <br>
+    <a href="{{ url_for('main.index') }}">Volver a la página principal</a>
+
+    <script src="/static/js/scripts.js"></script>
+</body>
+</html>
