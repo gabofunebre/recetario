@@ -33,6 +33,11 @@ ups:
 ps:
 	docker ps
 
+push:
+	git add .
+	git commit -m "$(word 2, $(MAKECMDGOALS))"
+	git push
+
 pull:
 	git pull origin main
 
