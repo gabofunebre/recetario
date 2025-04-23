@@ -44,4 +44,34 @@ buscador.addEventListener("keyup", function (e) {
         const query = this.value.trim();
         obtenerRecetas(query).then(filtradas => mostrarResultados(filtradas));
     }
-});
+}
+
+// Función para agregar nuevos campos de ingredientes
+function agregarIngrediente() {
+    const container = document.getElementById("ingredientes-container");
+    const nuevoIngrediente = document.createElement("div");
+    nuevoIngrediente.classList.add("ingrediente");
+    
+    nuevoIngrediente.innerHTML = `
+        <label for="ingrediente">Ingrediente:</label>
+        <input type="text" name="ingredientes[]" required>
+        <label for="cantidad">Cantidad:</label>
+        <input type="number" name="cantidades[]" required>
+        <label for="unidad">Unidad:</label>
+        <select name="unidades[]">
+            <option value="gramos">Gramos</option>
+            <option value="kilogramos">Kilogramos</option>
+            <option value="ml">Mililitros</option>
+            <option value="litros">Litros</option>
+            <option value="taza">Taza</option>
+            <option value="cucharada">Cucharada</option>
+            <option value="cucharadita">Cucharadita</option>
+        </select>
+        <br><br>
+    `;
+    container.appendChild(nuevoIngrediente);
+}
+
+
+
+);

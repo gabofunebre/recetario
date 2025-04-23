@@ -8,9 +8,6 @@ up:
 down:
 	docker compose down -v
 
-restart:
-	docker compose down -v && docker compose up --build -d
-
 logs:
 	docker compose logs -f
 

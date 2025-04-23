@@ -19,6 +19,30 @@
         <label for="metodo">Método de Preparación:</label>
         <textarea id="metodo" name="metodo" required></textarea><br><br>
 
+        <!-- Ingredientes -->
+        <div id="ingredientes-container">
+            <h3>Ingredientes</h3>
+            <div class="ingrediente">
+                <label for="ingrediente">Ingrediente:</label>
+                <input type="text" name="ingredientes[]" required>
+                <label for="cantidad">Cantidad:</label>
+                <input type="number" name="cantidades[]" required>
+                <label for="unidad">Unidad:</label>
+                <select name="unidades[]">
+                    <option value="gramos">Gramos</option>
+                    <option value="kilogramos">Kilogramos</option>
+                    <option value="ml">Mililitros</option>
+                    <option value="litros">Litros</option>
+                    <option value="taza">Taza</option>
+                    <option value="cucharada">Cucharada</option>
+                    <option value="cucharadita">Cucharadita</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Botón para agregar más ingredientes -->
+        <button type="button" onclick="agregarIngrediente()">Agregar Ingrediente</button><br><br>
+
         <button type="submit">Crear Receta</button>
     </form>
 

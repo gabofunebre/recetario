@@ -72,28 +72,40 @@ def crear_plato(carta_id):
         return redirect(url_for('main.cartas'))  # Redirige a la lista de cartas
     return render_template('crear_plato.html', carta=carta)
 
-# Ruta para crear una receta
+# Ruta para crear una receta con ingredientes
 @main.route('/crear_receta', methods=['GET', 'POST'])
 def crear_receta():
     if request.method == 'POST':
         nombre = request.form['nombre']
         autor = request.form['autor']
         metodo = request.form['metodo']
+        ingredientes_data = request.form.getlist('ingredientes[]')  # Lista de ingredientes
+        cantidades_data = request.form.getlist('cantidades[]')  # Lista de cantidades
+        unidades_data = request.form.getlist('unidades[]')  # Lista de unidades
         
-        # Validar que los campos no estén vacíos
+        # Asegúrate de que los datos no estén vacíos
         if not nombre or not autor or not metodo:
-            return render_template('crear_receta_independiente.html', error="Por favor, complete todos los campos.")
+            return "Por favor, complete todos los campos", 400  # Error si algún campo está vacío
         
-        # Crear la nueva receta
+        # Crear la receta
         receta = Receta(nombre=nombre, autor=autor, metodo=metodo)
         db.session.add(receta)
         db.session.commit()
 
-        # Redirigir a la lista de recetas o cartas, según lo que desees
-        return redirect(url_for('main.cartas'))  # O puedes redirigir a otra vista si prefieres
+        # Crear ingredientes y asociarlos a la receta
+        for i in range(len(ingredientes_data)):
+            ingrediente = Ingrediente(
+                nombre=ingredientes_data[i],
+                cantidad=cantidades_data[i],
+                unidad=unidades_data[i],
+                receta_id=receta.id
+            )
+            db.session.add(ingrediente)
+        
+        db.session.commit()
+        return redirect(url_for('main.cartas'))  # Redirige a la lista de cartas
 
-    # Si es GET, simplemente muestra el formulario de crear receta
-    return render_template('crear_receta_independiente.html')
+    return render_template('crear_receta_independiente.html')  # Si es GET, muestra el formulario de crear receta
 
 # Ruta para crear un ingrediente en una receta específica
 @main.route('/crear_ingrediente/<int:receta_id>', methods=['GET', 'POST'])
