@@ -11,16 +11,37 @@ function inicializarFuse(data) {
     const opciones = {
         includeScore: true,
         threshold: 0.4,
-        keys: ["nombre"]  // aplica a recetas, platos e ingredientes
+        keys: [
+            "nombre",
+            "descripcion",
+            "plato_nombre",
+            "ingredientes_texto"
+        ]
     };
 
-    // Combinar todos los objetos en un solo array con tipo
     const fuseData = [];
 
-    data.recetas.forEach(r => fuseData.push({ ...r, tipo: "receta" }));
-    data.platos.forEach(p => fuseData.push({ ...p, tipo: "plato" }));
-    data.ingredientes.forEach(i => fuseData.push({ ...i, tipo: "ingrediente" }));
+    if (data.recetas) {
+        data.recetas.forEach(r => {
+            const receta = {
+                ...r,
+                tipo: "receta",
+                plato_nombre: r.plato?.nombre || "",
+                ingredientes_texto: r.ingredientes?.map(i => i.nombre).join(" ") || "",
+            };
+            fuseData.push(receta);
+        });
+    }
 
+    if (data.platos) {
+        data.platos.forEach(p => fuseData.push({ ...p, tipo: "plato" }));
+    }
+
+    if (data.ingredientes) {
+        data.ingredientes.forEach(i => fuseData.push({ ...i, tipo: "ingrediente" }));
+    }
+
+    console.log("🔍 fuseData:", fuseData);
     fuse = new Fuse(fuseData, opciones);
 }
 
@@ -87,36 +108,51 @@ function mostrarResultados(resultadosFuse) {
 // Obtener todos los datos una vez y preparar Fuse.js
 fetch("/buscar_recetas?q=")
     .then(response => response.json())
-    .then(data => inicializarFuse(data))
-    .catch(error => console.error("Error inicializando Fuse.js:", error));
+    .then(data => {
+        console.log("✅ Datos recibidos del servidor:", data);
+        inicializarFuse(data);
+    })
+    .catch(error => console.error("❌ Error inicializando Fuse.js:", error));
 
-// Buscar cuando se escribe
+// Buscar mientras se escribe
 buscador.addEventListener("input", function () {
     const query = this.value.trim();
 
     if (query.length > 0 && fuse) {
         const resultadosFiltrados = fuse.search(query);
+        console.log("🔍 Resultados filtrados para:", query, resultadosFiltrados);
         mostrarResultados(resultadosFiltrados);
     } else {
+        console.log("🕵️ Sin resultados o Fuse no inicializado.");
         resultados.innerHTML = "";
     }
 });
 
-// También al presionar Enter
+// También buscar al presionar Enter
 buscador.addEventListener("keyup", function (e) {
     if (e.key === "Enter") {
         const query = this.value.trim();
 
         if (query.length === 0) {
+            console.log("⏎ Enter con input vacío, redirigiendo a /recetas");
             window.location.href = "/recetas";
         } else if (fuse) {
             const resultadosFiltrados = fuse.search(query);
-            mostrarResultados(resultadosFiltrados);
+            console.log("⏎ Enter presionado. Resultados filtrados para:", query, resultadosFiltrados);
+
+            if (resultadosFiltrados.length === 0) {
+                console.log("🚫 Sin resultados. Redirigiendo a /recetas con query.");
+                window.location.href = `/recetas?q=${encodeURIComponent(query)}`;
+            } else {
+                mostrarResultados(resultadosFiltrados);
+            }
+        } else {
+            console.log("⚠️ Fuse no está inicializado.");
         }
     }
 });
 
-// Función para agregar nuevos campos de ingredientes (sin cambios)
+// Agregar nuevos campos de ingredientes
 function agregarIngrediente() {
     const container = document.getElementById("ingredientes-container");
     const nuevoIngrediente = document.createElement("div");

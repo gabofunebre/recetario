@@ -13,31 +13,42 @@ def index():
 # Ruta para obtener las recetas en formato JSON
 @main.route('/api/recetas', methods=['GET'])
 def api_recetas():
-    recetas = Receta.query.all()  # Obtener todas las recetas desde la base de datos
+    recetas = Receta.query.all()
     recetas_json = [{"id": receta.id, "nombre": receta.nombre, "descripcion": receta.descripcion} for receta in recetas]
     return jsonify(recetas_json)
 
-# Ruta para ver una receta
+# ✅ Ruta unificada para buscador con Fuse.js
+@main.route('/api/todo', methods=['GET'])
+def api_todo():
+    recetas = Receta.query.all()
+    ingredientes = Ingrediente.query.all()
+    platos = Plato.query.all()
+
+    data = {
+        "recetas": [{"id": r.id, "nombre": r.nombre, "descripcion": r.descripcion} for r in recetas],
+        "ingredientes": [{"nombre": i.nombre, "receta_id": i.receta_id} for i in ingredientes],
+        "platos": [{"nombre": p.nombre, "carta_id": p.carta_id} for p in platos]
+    }
+
+    return jsonify(data)
+
 @main.route('/receta/<int:id>')
 def mostrar_receta(id):
     receta = Receta.query.get_or_404(id)
     ingredientes = Ingrediente.query.filter_by(receta_id=id).all()
     return render_template('mostrar_receta.html', receta=receta, ingredientes=ingredientes)
 
-# Ruta para ver todas las cartas
 @main.route('/cartas')
 def cartas():
     cartas = Carta.query.all()
     return render_template('cartas.html', cartas=cartas)
 
-# Ruta para ver la carta actual (la más reciente)
 @main.route('/carta_actual')
 def carta_actual():
     carta = Carta.query.order_by(Carta.id.desc()).first()
     platos = Plato.query.filter_by(carta_id=carta.id).all() if carta else []
     return render_template('carta_actual.html', carta=carta, platos=platos)
 
-# Ruta para crear una nueva carta
 @main.route('/crear_carta', methods=['GET', 'POST'])
 def crear_carta():
     recetas = Receta.query.all()
@@ -51,7 +62,6 @@ def crear_carta():
         return redirect(url_for('main.cartas'))
     return render_template('crear_carta.html', recetas=recetas)
 
-# Ruta para crear un plato en una carta específica
 @main.route('/crear_plato/<int:carta_id>', methods=['GET', 'POST'])
 def crear_plato(carta_id):
     carta = Carta.query.get(carta_id)
@@ -65,7 +75,6 @@ def crear_plato(carta_id):
         return redirect(url_for('main.cartas'))
     return render_template('crear_plato.html', carta=carta)
 
-# Ruta para crear una receta con ingredientes
 @main.route('/crear_receta', methods=['GET', 'POST'])
 def crear_receta():
     if request.method == 'POST':
@@ -97,7 +106,6 @@ def crear_receta():
 
     return render_template('crear_receta_independiente.html')
 
-# Ruta para crear un ingrediente en una receta específica
 @main.route('/crear_ingrediente/<int:receta_id>', methods=['GET', 'POST'])
 def crear_ingrediente(receta_id):
     receta = Receta.query.get(receta_id)
@@ -112,16 +120,39 @@ def crear_ingrediente(receta_id):
         return redirect(url_for('main.mostrar_receta', id=receta.id))
     return render_template('crear_ingrediente.html', receta=receta)
 
-# Ruta para buscar recetas (API para AJAX)
-@main.route('/buscar_recetas', methods=['GET'])
+@main.route('/buscar_recetas')
 def buscar_recetas():
     query = request.args.get('q', '')
-    if query:
-        recetas = Receta.query.filter(Receta.nombre.ilike(f'%{query}%')).all()
-        return jsonify([{"id": r.id, "nombre": r.nombre} for r in recetas])
-    return jsonify([])
 
-# Nueva ruta para mostrar todas las recetas con mensaje opcional
+    recetas = Receta.query.all()
+    platos = Plato.query.all()
+    ingredientes = Ingrediente.query.all()
+
+    recetas_json = []
+    for receta in recetas:
+        recetas_json.append({
+            "id": receta.id,
+            "nombre": receta.nombre,
+            "descripcion": receta.descripcion,
+            "plato": {
+                "id": receta.plato.id,
+                "nombre": receta.plato.nombre
+            } if receta.plato else None,
+            "ingredientes": [
+                {"id": ing.id, "nombre": ing.nombre}
+                for ing in receta.ingredientes
+            ]
+        })
+
+    platos_json = [{"id": p.id, "nombre": p.nombre} for p in platos]
+    ingredientes_json = [{"id": i.id, "nombre": i.nombre} for i in ingredientes]
+
+    return jsonify({
+        "recetas": recetas_json,
+        "platos": platos_json,
+        "ingredientes": ingredientes_json
+    })
+
 @main.route('/recetas')
 def ver_recetas():
     query = request.args.get('q')
@@ -130,3 +161,4 @@ def ver_recetas():
         mensaje = f"No se encontraron resultados para '{query}'. Mostrando todas las recetas."
     recetas = Receta.query.all()
     return render_template('recetas.html', recetas=recetas, mensaje=mensaje)
+    
