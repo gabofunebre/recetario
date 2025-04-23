@@ -6,7 +6,7 @@ up:
 	docker compose up --build -d
 
 down:
-	docker compose down -v
+	docker compose down -v 
 
 logs:
 	docker compose logs -f
@@ -38,6 +38,10 @@ pull:
 	git pull origin main
 
 refresh:
-	git pull origin main && docker compose down -v && docker compose up --build -d
+	docker compose down -v && docker compose up --build -d
+
+restart:
+	docker compose down -v && docker compose up --build -d 
+	docker exec -it $(CONTAINER) python seed.py
 
 # Podés agregar más comandos si los necesitás

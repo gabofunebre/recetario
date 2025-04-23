@@ -89,3 +89,24 @@ button:hover {
 .volver-btn:hover {
     background-color: #343a40;
 }
+
+/* Estilos para lista de recetas */
+.recetas-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.receta-item {
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.receta-item:hover {
+    background-color: #f1f1f1;
+}

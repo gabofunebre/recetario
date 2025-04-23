@@ -10,14 +10,12 @@ main = Blueprint('main', __name__)
 def index():
     return render_template('index.html')
 
-
 # Ruta para obtener las recetas en formato JSON
 @main.route('/api/recetas', methods=['GET'])
 def api_recetas():
     recetas = Receta.query.all()  # Obtener todas las recetas desde la base de datos
     recetas_json = [{"id": receta.id, "nombre": receta.nombre, "descripcion": receta.descripcion} for receta in recetas]
     return jsonify(recetas_json)
-
 
 # Ruta para ver una receta
 @main.route('/receta/<int:id>')
@@ -42,21 +40,16 @@ def carta_actual():
 # Ruta para crear una nueva carta
 @main.route('/crear_carta', methods=['GET', 'POST'])
 def crear_carta():
-    recetas = Receta.query.all()  # Trae todas las recetas
+    recetas = Receta.query.all()
     if request.method == 'POST':
         nombre = request.form['nombre']
         autor = request.form['autor']
-        receta_id = request.form['recetas']  # Obtenemos la receta seleccionada
+        receta_id = request.form['recetas']
         carta = Carta(nombre=nombre, autor=autor)
         db.session.add(carta)
         db.session.commit()
-
-        # Asociar la receta al plato si es necesario, puedes expandir esta lógica
-        # En caso de que desees que se cree un plato automáticamente o asociar recetas más tarde
-
-        return redirect(url_for('main.cartas'))  # Redirige a la lista de cartas
-    return render_template('crear_carta.html', recetas=recetas)  # Pasa las recetas disponibles a la plantilla
-
+        return redirect(url_for('main.cartas'))
+    return render_template('crear_carta.html', recetas=recetas)
 
 # Ruta para crear un plato en una carta específica
 @main.route('/crear_plato/<int:carta_id>', methods=['GET', 'POST'])
@@ -69,7 +62,7 @@ def crear_plato(carta_id):
         plato = Plato(nombre=nombre, ingredientes=ingredientes, autor=autor, carta_id=carta.id)
         db.session.add(plato)
         db.session.commit()
-        return redirect(url_for('main.cartas'))  # Redirige a la lista de cartas
+        return redirect(url_for('main.cartas'))
     return render_template('crear_plato.html', carta=carta)
 
 # Ruta para crear una receta con ingredientes
@@ -79,20 +72,17 @@ def crear_receta():
         nombre = request.form['nombre']
         autor = request.form['autor']
         metodo = request.form['metodo']
-        ingredientes_data = request.form.getlist('ingredientes[]')  # Lista de ingredientes
-        cantidades_data = request.form.getlist('cantidades[]')  # Lista de cantidades
-        unidades_data = request.form.getlist('unidades[]')  # Lista de unidades
-        
-        # Asegúrate de que los datos no estén vacíos
+        ingredientes_data = request.form.getlist('ingredientes[]')
+        cantidades_data = request.form.getlist('cantidades[]')
+        unidades_data = request.form.getlist('unidades[]')
+
         if not nombre or not autor or not metodo:
-            return "Por favor, complete todos los campos", 400  # Error si algún campo está vacío
-        
-        # Crear la receta
+            return "Por favor, complete todos los campos", 400
+
         receta = Receta(nombre=nombre, autor=autor, metodo=metodo)
         db.session.add(receta)
         db.session.commit()
 
-        # Crear ingredientes y asociarlos a la receta
         for i in range(len(ingredientes_data)):
             ingrediente = Ingrediente(
                 nombre=ingredientes_data[i],
@@ -101,11 +91,11 @@ def crear_receta():
                 receta_id=receta.id
             )
             db.session.add(ingrediente)
-        
-        db.session.commit()
-        return redirect(url_for('main.cartas'))  # Redirige a la lista de cartas
 
-    return render_template('crear_receta_independiente.html')  # Si es GET, muestra el formulario de crear receta
+        db.session.commit()
+        return redirect(url_for('main.cartas'))
+
+    return render_template('crear_receta_independiente.html')
 
 # Ruta para crear un ingrediente en una receta específica
 @main.route('/crear_ingrediente/<int:receta_id>', methods=['GET', 'POST'])
@@ -114,28 +104,29 @@ def crear_ingrediente(receta_id):
     if request.method == 'POST':
         nombre = request.form['nombre']
         cantidad = request.form['cantidad']
-        
-        # Validación de los campos
         if not nombre or not cantidad:
             return render_template('crear_ingrediente.html', receta=receta, error="Por favor, complete todos los campos.")
-        
-        # Crear el ingrediente
         ingrediente = Ingrediente(nombre=nombre, cantidad=cantidad, receta_id=receta.id)
         db.session.add(ingrediente)
         db.session.commit()
-        return redirect(url_for('main.mostrar_receta', id=receta.id))  # Redirige a la receta específica
+        return redirect(url_for('main.mostrar_receta', id=receta.id))
     return render_template('crear_ingrediente.html', receta=receta)
 
-
-# Ruta para buscar recetas en la base de datos
+# Ruta para buscar recetas (API para AJAX)
 @main.route('/buscar_recetas', methods=['GET'])
 def buscar_recetas():
-    query = request.args.get('q', '')  # Obtener la consulta de búsqueda desde los parámetros GET
+    query = request.args.get('q', '')
     if query:
-        recetas = Receta.query.filter(Receta.nombre.ilike(f'%{query}%')).all()  # Filtrar recetas por nombre
-    else:
-        recetas = []
+        recetas = Receta.query.filter(Receta.nombre.ilike(f'%{query}%')).all()
+        return jsonify([{"id": r.id, "nombre": r.nombre} for r in recetas])
+    return jsonify([])
 
-    # Convertir las recetas a un formato JSON para enviarlas al frontend
-    recetas_json = [{"id": receta.id, "nombre": receta.nombre} for receta in recetas]
-    return jsonify(recetas_json)
+# Nueva ruta para mostrar todas las recetas con mensaje opcional
+@main.route('/recetas')
+def ver_recetas():
+    query = request.args.get('q')
+    mensaje = None
+    if query:
+        mensaje = f"No se encontraron resultados para '{query}'. Mostrando todas las recetas."
+    recetas = Receta.query.all()
+    return render_template('recetas.html', recetas=recetas, mensaje=mensaje)

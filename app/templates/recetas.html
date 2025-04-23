@@ -1,0 +1,30 @@
+<!-- templates/recetas.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Recetas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Recetas disponibles</h1>
+
+    {% if mensaje %}
+        <p style="color: red;"><strong>{{ mensaje }}</strong></p>
+    {% endif %}
+
+    {% if recetas %}
+        <ul>
+            {% for receta in recetas %}
+                <li>
+                    <a href="{{ url_for('main.mostrar_receta', id=receta.id) }}">
+                        {{ receta.nombre }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No hay recetas registradas.</p>
+    {% endif %}
+</body>
+</html>
