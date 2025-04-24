@@ -1,54 +1,69 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Receta</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
-</head>
-<body>
-    <h1>Crear Nueva Receta</h1>
+{% extends 'base.html' %}
 
-    <form method="POST">
-        <label for="nombre">Nombre de la Receta:</label>
-        <input type="text" id="nombre" name="nombre" required><br><br>
+{% block title %}Crear Receta{% endblock %}
 
-        <label for="autor">Autor:</label>
-        <input type="text" id="autor" name="autor" required><br><br>
+{% block content %}
+  <h1 class="mb-4">Crear Nueva Receta</h1>
 
-        <label for="metodo">Método de Preparación:</label>
-        <textarea id="metodo" name="metodo" required></textarea><br><br>
+  <form method="POST">
+    <div class="row g-3 mb-3">
+      <div class="col-md-6">
+        <label for="nombre" class="form-label">Nombre de la Receta</label>
+        <input type="text" id="nombre" name="nombre" class="form-control" required>
+      </div>
+      <div class="col-md-6">
+        <label for="autor" class="form-label">Autor</label>
+        <input type="text" id="autor" name="autor" class="form-control" required>
+      </div>
+    </div>
 
-        <!-- Ingredientes -->
-        <div id="ingredientes-container">
-            <h3>Ingredientes</h3>
-            <div class="ingrediente">
-                <label for="ingrediente">Ingrediente:</label>
-                <input type="text" name="ingredientes[]" required>
-                <label for="cantidad">Cantidad:</label>
-                <input type="number" name="cantidades[]" required>
-                <label for="unidad">Unidad:</label>
-                <select name="unidades[]">
-                    <option value="gramos">Gramos</option>
-                    <option value="kilogramos">Kilogramos</option>
-                    <option value="ml">Mililitros</option>
-                    <option value="litros">Litros</option>
-                    <option value="taza">Taza</option>
-                    <option value="cucharada">Cucharada</option>
-                    <option value="cucharadita">Cucharadita</option>
-                </select>
-            </div>
+    <div class="mb-4">
+      <label for="metodo" class="form-label">Método de Preparación</label>
+      <textarea id="metodo" name="metodo" class="form-control" rows="4" required></textarea>
+    </div>
+
+    <hr>
+    <h3 class="mb-3">Ingredientes</h3>
+    <div id="ingredientes-container">
+      <div class="row g-2 align-items-end mb-2 ingrediente">
+        <div class="col-md-5">
+          <label class="form-label">Ingrediente</label>
+          <input type="text" name="ingredientes[]" class="form-control" placeholder="Ej. Harina" required>
         </div>
+        <div class="col-md-3">
+          <label class="form-label">Cantidad</label>
+          <input type="number" name="cantidades[]" class="form-control" placeholder="Ej. 100" required>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Unidad</label>
+          <select name="unidades[]" class="form-select">
+            <option value="gramos">Gramos</option>
+            <option value="kilogramos">Kilogramos</option>
+            <option value="ml">Mililitros</option>
+            <option value="litros">Litros</option>
+            <option value="unidad">Unidad</option>
+            <option value="puñado">Puñado</option>
+            <option value="taza">Taza</option>
+            <option value="cucharada">Cucharada</option>
+            <option value="cucharadita">Cucharadita</option>
+          </select>
+        </div>
+        <div class="col-md-1 text-end">
+          <button type="button" class="btn btn-outline-danger btn-remove" title="Eliminar ingrediente">&times;</button>
+        </div>
+      </div>
+    </div>
 
-        <!-- Botón para agregar más ingredientes -->
-        <button type="button" onclick="agregarIngrediente()">Agregar Ingrediente</button><br><br>
+    <div class="mb-4">
+      <button type="button" class="btn btn-secondary" id="btn-agregar">Agregar Ingrediente</button>
+    </div>
 
-        <button type="submit">Crear Receta</button>
-    </form>
+    <div class="d-grid">
+      <button type="submit" class="btn btn-primary btn-lg">Crear Receta</button>
+    </div>
+  </form>
 
-    <br>
-    <a href="{{ url_for('main.index') }}">Volver a la página principal</a>
-
-    <script src="/static/js/scripts.js"></script>
-</body>
-</html>
+  <div class="mt-4">
+    <a href="{{ url_for('main.index') }}" class="link-secondary">Volver a la página principal</a>
+  </div>
+{% endblock %}

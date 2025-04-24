@@ -1,112 +1,58 @@
+/* Custom Styles for Recetario App */
+
+/* Body background and font */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
     background-color: #f8f9fa;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
-
-.container {
-    text-align: center;
-}
-
-h1 {
-    font-size: 3em;
-    margin-bottom: 30px;
-}
-
-input[type="text"] {
-    padding: 10px;
-    font-size: 1em;
-    width: 300px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-}
-
-button {
-    padding: 10px 20px;
-    font-size: 1em;
-    margin: 10px 5px;
-    border: none;
-    border-radius: 10px;
-    background-color: #495057;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-button:hover {
-    background-color: #343a40;
-}
-
-#resultados {
-    margin-top: 10px;
-    width: 300px;
-    text-align: left;
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-.resultado {
-    background: white;
-    padding: 10px;
-    border: 1px solid #ddd;
-    cursor: pointer;
-    border-radius: 5px;
-    margin-bottom: 5px;
-    transition: background-color 0.2s;
-}
-
-.resultado:hover {
-    background: #eee;
-}
-
-/* Estilos para la vista individual de receta */
-.receta-container {
-    max-width: 600px;
-    margin: 40px auto;
+    color: #212529;
+  }
+  
+  /* Container adjustments */
+  .container {
+    max-width: 960px;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  /* Ingredient item styling */
+  .ingrediente {
+    padding: 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
     background-color: #ffffff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-
-.volver-btn {
-    margin-top: 20px;
-    background-color: #495057;
-    color: white;
+  }
+  
+  /* Space between ingredient items */
+  .ingrediente + .ingrediente {
+    margin-top: 1rem;
+  }
+  
+  /* Remove ingredient button styling */
+  .btn-remove {
+    font-size: 1.25rem;
+    line-height: 1;
+    color: #dc3545;
+    background: none;
     border: none;
-    padding: 10px 20px;
-    font-size: 1em;
-    border-radius: 10px;
+  }
+  .btn-remove:hover {
+    color: #bd2130;
+  }
+  
+  /* Search results dropdown */
+  #resultados {
+    position: absolute;
+    width: 100%;
+    z-index: 1000;
+  }
+  .resultado {
+    background: #ffffff;
+    padding: 0.5rem;
+    border: 1px solid #dee2e6;
+    border-top: none;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.volver-btn:hover {
-    background-color: #343a40;
-}
-
-/* Estilos para lista de recetas */
-.recetas-container {
-    max-width: 800px;
-    margin: 40px auto;
-    padding: 30px;
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-
-.receta-item {
-    border-bottom: 1px solid #ddd;
-    padding: 10px 0;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.receta-item:hover {
-    background-color: #f1f1f1;
-}
+  }
+  .resultado:hover {
+    background-color: #f8f9fa;
+  }
+  

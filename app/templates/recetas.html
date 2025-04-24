@@ -1,31 +1,30 @@
-<!-- templates/recetas.html -->
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Recetas</title>
-    <!-- Usando url_for para cargar el archivo CSS correctamente -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-</head>
-<body>
-    <h1>Recetas disponibles</h1>
+{% extends 'base.html' %}
 
-    {% if mensaje %}
-        <p style="color: red;"><strong>{{ mensaje }}</strong></p>
-    {% endif %}
+{% block title %}Recetas{% endblock %}
 
-    {% if recetas %}
-        <ul>
-            {% for receta in recetas %}
-                <li>
-                    <a href="{{ url_for('main.mostrar_receta', id=receta.id) }}">
-                        {{ receta.nombre }}
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Recetas</h1>
+    <a href="{{ url_for('main.crear_receta') }}" class="btn btn-success">Crear Nueva Receta</a>
+  </div>
+
+  <div class="row">
+    {% for receta in recetas %}
+      <div class="col-md-4 mb-3">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">{{ receta.nombre }}</h5>
+            {% if receta.descripcion %}
+              <p class="card-text">{{ receta.descripcion }}</p>
+            {% endif %}
+            <a href="{{ url_for('main.mostrar_receta', id=receta.id) }}" class="btn btn-primary">Ver Receta</a>
+          </div>
+        </div>
+      </div>
     {% else %}
-        <p>No hay recetas registradas.</p>
-    {% endif %}
-</body>
-</html>
+      <div class="col-12">
+        <p>No hay recetas disponibles.</p>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}

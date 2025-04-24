@@ -1,32 +1,18 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Recetario</title>
-  <!-- Enlace al CSS usando url_for para servir correctamente -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-</head>
-<body>
-  <div class="container">
-    <h1>Recetario</h1>
+{% extends 'base.html' %}
 
-    <!-- Buscador de recetas -->
-    <input type="text" id="buscador" placeholder="Buscar receta...">
-    <div id="resultados"></div>
+{% block title %}Recetario{% endblock %}
 
-    <!-- Botones de navegación -->
-    <div class="botones">
-      <button onclick="location.href='{{ url_for('main.carta_actual') }}'">Carta actual</button>
-      <button onclick="location.href='{{ url_for('main.cartas') }}'">Ver cartas</button>
-      <button onclick="location.href='{{ url_for('main.crear_receta') }}'">Crear nueva receta</button>
-    </div>
+{% block content %}
+  <h1 class="mb-4">Recetario</h1>
+
+  <div class="mb-3">
+    <input
+      type="text"
+      id="buscador"
+      class="form-control"
+      placeholder="Buscar receta..."
+    >
   </div>
 
-  <!-- CDN de Fuse.js (debe cargarse antes de scripts.js) -->
-  <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
-
-  <!-- Archivo de scripts propio -->
-  <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
-</body>
-</html>
+  <div id="resultados"></div>
+{% endblock %}

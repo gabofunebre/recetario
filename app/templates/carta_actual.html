@@ -1,27 +1,28 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ carta.nombre if carta else 'Sin carta actual' }}</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
-</head>
-<body>
-    {% if carta %}
-        <h1>{{ carta.nombre }}</h1>
-        <h2>Autor: {{ carta.autor }}</h2>
+{% extends 'base.html' %}
 
-        <h3>Platos:</h3>
-        <ul>
-            {% for plato in platos %}
-                <li>
-                    <strong>{{ plato.nombre }}</strong> - {{ plato.autor }}<br>
-                    Ingredientes: {{ plato.ingredientes }}
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No hay una carta actual disponible.</p>
-    {% endif %}
-    <a href="/">← Volver al inicio</a>
-</body>
-</html>
+{% block title %}{{ carta.nombre if carta else 'Sin carta actual' }}{% endblock %}
+
+{% block content %}
+  {% if carta %}
+    <div class="mb-4">
+      <h1>{{ carta.nombre }}</h1>
+      <p class="text-muted">Autor: {{ carta.autor }}</p>
+    </div>
+
+    <h3>Platos:</h3>
+    <ul class="list-group mb-3">
+      {% for plato in platos %}
+        <li class="list-group-item">
+          <strong>{{ plato.nombre }}</strong> - <span class="text-muted">{{ plato.autor }}</span><br>
+          <small>Ingredientes: {{ plato.ingredientes }}</small>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="alert alert-warning" role="alert">
+      No hay una carta actual disponible.
+    </div>
+  {% endif %}
+
+  <a href="{{ url_for('main.index') }}" class="btn btn-secondary">← Volver al inicio</a>
+{% endblock %}

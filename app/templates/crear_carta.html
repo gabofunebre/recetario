@@ -1,34 +1,31 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Carta</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
-</head>
-<body>
-    <h1>Crear Nueva Carta</h1>
-    <form method="POST">
-        <label for="nombre">Nombre de la Carta:</label>
-        <input type="text" id="nombre" name="nombre" required><br><br>
+{% extends 'base.html' %}
 
-        <label for="autor">Autor:</label>
-        <input type="text" id="autor" name="autor" required><br><br>
+{% block title %}Crear Carta{% endblock %}
 
-        <label for="recetas">Seleccionar Recetas:</label>
-        <select name="recetas" id="recetas">
-            {% for receta in recetas %}
-                <option value="{{ receta.id }}">{{ receta.nombre }}</option>
-            {% endfor %}
-        </select><br><br>
+{% block content %}
+  <h1 class="mb-4">Crear Nueva Carta</h1>
 
-        <button type="submit">Crear Carta</button>
-    </form>
+  <form method="POST">
+    <div class="mb-3">
+      <label for="nombre" class="form-label">Nombre de la Carta</label>
+      <input type="text" id="nombre" name="nombre" class="form-control" required>
+    </div>
 
-    <br>
-    <a href="{{ url_for('main.index') }}">Volver a la página principal</a>
+    <div class="mb-3">
+      <label for="autor" class="form-label">Autor</label>
+      <input type="text" id="autor" name="autor" class="form-control" required>
+    </div>
 
-    <script src="/static/js/scripts.js"></script>
-</body>
-</html>
+    <div class="mb-3">
+      <label for="recetas" class="form-label">Seleccionar Recetas</label>
+      <select name="recetas" id="recetas" class="form-select" required>
+        {% for receta in recetas %}
+          <option value="{{ receta.id }}">{{ receta.nombre }}</option>
+        {% endfor %}
+      </select>
+    </div>
 
+    <button type="submit" class="btn btn-primary">Crear Carta</button>
+    <a href="{{ url_for('main.index') }}" class="btn btn-secondary ms-2">Volver</a>
+  </form>
+{% endblock %}
