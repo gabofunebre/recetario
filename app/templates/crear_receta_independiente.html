@@ -11,9 +11,13 @@
         <label for="nombre" class="form-label">Nombre de la Receta</label>
         <input type="text" id="nombre" name="nombre" class="form-control" required>
       </div>
-      <div class="col-md-6">
-        <label for="autor" class="form-label">Autor</label>
-        <input type="text" id="autor" name="autor" class="form-control" required>
+      <div class="col-md-6 position-relative">
+        <label for="autor_busqueda" class="form-label">Autor</label>
+        <input type="text" id="autor_busqueda" class="form-control" placeholder="Buscar usuario...">
+        <input type="hidden" name="usuario_id" id="usuario_id">
+        <div id="resultados_usuarios" class="list-group position-absolute w-100 mt-1"></div>
+        <small class="form-text text-muted">O ingresa un autor libre a continuación:</small>
+        <input type="text" id="autor_libre" name="autor_libre" class="form-control mt-2" placeholder="Nombre del autor libre">
       </div>
     </div>
 

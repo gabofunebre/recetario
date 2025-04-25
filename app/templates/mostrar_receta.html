@@ -8,18 +8,6 @@
     <p class="text-muted">Autor: {{ receta.autor }}</p>
   </div>
 
-  {% if receta.descripcion %}
-    <div class="mb-4">
-      <h5>Descripción</h5>
-      <p>{{ receta.descripcion }}</p>
-    </div>
-  {% endif %}
-
-  <div class="mb-4">
-    <h5>Método de Preparación</h5>
-    <p>{{ receta.metodo }}</p>
-  </div>
-
   {% if receta.ingredientes %}
     <div class="mb-4">
       <h5>Ingredientes</h5>
@@ -28,15 +16,13 @@
           <tr>
             <th>Ingrediente</th>
             <th>Cantidad</th>
-            <th>Unidad</th>
           </tr>
         </thead>
         <tbody>
           {% for ing in receta.ingredientes %}
             <tr>
               <td>{{ ing.nombre }}</td>
-              <td>{{ ing.cantidad }}</td>
-              <td>{{ ing.unidad }}</td>
+              <td>{{ ing.cantidad }}{{ ing.unidad if ing.unidad }}</td>
             </tr>
           {% endfor %}
         </tbody>
@@ -44,5 +30,17 @@
     </div>
   {% endif %}
 
-  <a href="{{ url_for('main.recetas') }}" class="btn btn-secondary">Volver a Recetas</a>
+  <div class="mb-4">
+    <h5>Método de Preparación</h5>
+    <p>{{ receta.metodo }}</p>
+  </div>
+
+  {% if receta.descripcion %}
+    <div class="mb-4">
+      <h5>Descripción</h5>
+      <p>{{ receta.descripcion }}</p>
+    </div>
+  {% endif %}
+
+  <a href="{{ url_for('main.ver_recetas') }}" class="btn btn-secondary">Volver a Recetas</a>
 {% endblock %}

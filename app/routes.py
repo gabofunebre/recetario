@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for, Blueprint, jsonify
 from . import db
-from .models import Carta, Plato, Receta, Ingrediente
+from .models import Carta, Plato, Receta, Ingrediente, Usuario
 from datetime import datetime
 
 # Crea el blueprint para las rutas principales
@@ -10,31 +10,40 @@ main = Blueprint('main', __name__)
 def index():
     return render_template('index.html')
 
-# Ruta para obtener las recetas en formato JSON
-@main.route('/api/recetas', methods=['GET'])
-def api_recetas():
+# API para obtener recetas en formato JSON
+@main.route('/buscar_recetas')
+def buscar_recetas():
     recetas = Receta.query.all()
-    recetas_json = [{"id": receta.id, "nombre": receta.nombre, "descripcion": receta.descripcion} for receta in recetas]
-    return jsonify(recetas_json)
-
-# ✅ Ruta unificada para buscador con Fuse.js
-@main.route('/api/todo', methods=['GET'])
-def api_todo():
-    recetas = Receta.query.all()
-    ingredientes = Ingrediente.query.all()
     platos = Plato.query.all()
-    data = {
-        "recetas": [{"id": r.id, "nombre": r.nombre, "descripcion": r.descripcion} for r in recetas],
-        "ingredientes": [{"nombre": i.nombre, "receta_id": i.receta_id} for i in ingredientes],
-        "platos": [{"nombre": p.nombre, "carta_id": p.carta_id} for p in platos]
-    }
-    return jsonify(data)
+    ingredientes = Ingrediente.query.all()
+    recetas_json = []
+    for receta in recetas:
+        recetas_json.append({
+            "id": receta.id,
+            "nombre": receta.nombre,
+            "descripcion": receta.descripcion,
+            "plato": {"id": receta.plato.id, "nombre": receta.plato.nombre} if receta.plato else None,
+            "ingredientes": [{"id": ing.id, "nombre": ing.nombre} for ing in receta.ingredientes]
+        })
+    platos_json = [{"id": p.id, "nombre": p.nombre} for p in platos]
+    ingredientes_json = [{"id": i.id, "nombre": i.nombre} for i in ingredientes]
+    return jsonify({"recetas": recetas_json, "platos": platos_json, "ingredientes": ingredientes_json})
 
-# Mostrar detalle de una receta
-@main.route('/receta/<int:id>')
-def mostrar_receta(id):
-    receta = Receta.query.get_or_404(id)
-    return render_template('mostrar_receta.html', receta=receta)
+# API dinámico de autores (usuarios + autores históricos de recetas)
+@main.route('/api/autores', methods=['GET'])
+def api_autores():
+    # Nombres de usuarios registrados
+    usuarios = [u.nombre for u in Usuario.query.all()]
+    # Nombres de autor existentes en recetas
+    autores_receta = [r.autor for r in Receta.query.with_entities(Receta.autor).distinct()]
+    # Combinar y eliminar duplicados preservando orden
+    nombres = []
+    for name in usuarios + autores_receta:
+        if name and name not in nombres:
+            nombres.append(name)
+    # Formatear para JSON
+    autores = [{"nombre": n} for n in nombres]
+    return jsonify(autores)
 
 # Listar todas las cartas
 @main.route('/cartas')
@@ -83,12 +92,19 @@ def crear_plato(carta_id):
         return redirect(url_for('main.cartas'))
     return render_template('crear_plato.html', carta=carta)
 
-# Crear nueva receta
+# Crear nueva receta con autor dinámico
 @main.route('/crear_receta', methods=['GET', 'POST'])
 def crear_receta():
     if request.method == 'POST':
+        autor_id = request.form.get('usuario_id')
+        autor_input = request.form.get('autor_busqueda', '').strip()
+        # Si el usuario seleccionó de la lista, usarlo, sino usar texto libre
+        autor = autor_input
+        if autor_id:
+            user = Usuario.query.get(int(autor_id))
+            if user:
+                autor = user.nombre
         nombre = request.form['nombre']
-        autor = request.form['autor']
         metodo = request.form['metodo']
         ingredientes_data = request.form.getlist('ingredientes[]')
         cantidades_data = request.form.getlist('cantidades[]')
@@ -99,52 +115,22 @@ def crear_receta():
         db.session.add(receta)
         db.session.commit()
         for i in range(len(ingredientes_data)):
-            ingrediente = Ingrediente(
+            ing = Ingrediente(
                 nombre=ingredientes_data[i],
                 cantidad=cantidades_data[i],
                 unidad=unidades_data[i],
                 receta_id=receta.id
             )
-            db.session.add(ingrediente)
+            db.session.add(ing)
         db.session.commit()
         return redirect(url_for('main.ver_recetas'))
     return render_template('crear_receta_independiente.html')
 
-# Crear ingrediente adicional en receta existente
-@main.route('/crear_ingrediente/<int:receta_id>', methods=['GET', 'POST'])
-def crear_ingrediente(receta_id):
-    receta = Receta.query.get_or_404(receta_id)
-    if request.method == 'POST':
-        nombre = request.form['nombre']
-        cantidad = request.form['cantidad']
-        unidad = request.form.get('unidad', '')
-        if not nombre or not cantidad:
-            return render_template('crear_ingrediente.html', receta=receta, error="Por favor, complete todos los campos.")
-        ingrediente = Ingrediente(nombre=nombre, cantidad=cantidad, unidad=unidad, receta_id=receta.id)
-        db.session.add(ingrediente)
-        db.session.commit()
-        return redirect(url_for('main.mostrar_receta', id=receta.id))
-    return render_template('crear_ingrediente.html', receta=receta)
-
-# API para búsqueda rápida (para script)
-@main.route('/buscar_recetas')
-def buscar_recetas():
-    query = request.args.get('q', '')
-    recetas = Receta.query.all()
-    platos = Plato.query.all()
-    ingredientes = Ingrediente.query.all()
-    recetas_json = []
-    for receta in recetas:
-        recetas_json.append({
-            "id": receta.id,
-            "nombre": receta.nombre,
-            "descripcion": receta.descripcion,
-            "plato": {"id": receta.plato.id, "nombre": receta.plato.nombre} if receta.plato else None,
-            "ingredientes": [{"id": ing.id, "nombre": ing.nombre} for ing in receta.ingredientes]
-        })
-    platos_json = [{"id": p.id, "nombre": p.nombre} for p in platos]
-    ingredientes_json = [{"id": i.id, "nombre": i.nombre} for i in ingredientes]
-    return jsonify({"recetas": recetas_json, "platos": platos_json, "ingredientes": ingredientes_json})
+# Mostrar detalle de una receta
+@main.route('/receta/<int:id>')
+def mostrar_receta(id):
+    receta = Receta.query.get_or_404(id)
+    return render_template('mostrar_receta.html', receta=receta)
 
 # Vista de recetas con mensaje opcional
 @main.route('/recetas')

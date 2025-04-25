@@ -39,7 +39,7 @@ body {
     color: #bd2130;
   }
   
-  /* Search results dropdown */
+  /* Search results dropdown for recipes */
   #resultados {
     position: absolute;
     width: 100%;
@@ -54,5 +54,26 @@ body {
   }
   .resultado:hover {
     background-color: #f8f9fa;
+  }
+  
+  /* Search results dropdown for users */
+  .position-relative #resultados_usuarios {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    background-color: #ffffff;
+  }
+  
+  .position-relative #resultados_usuarios .list-group-item {
+    cursor: pointer;
+  }
+  .position-relative #resultados_usuarios .list-group-item-action:hover {
+    background-color: #f1f1f1;
   }
   
