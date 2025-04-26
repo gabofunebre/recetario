@@ -2,6 +2,8 @@ from flask import render_template, request, redirect, url_for, Blueprint, jsonif
 from . import db
 from .models import Carta, Plato, Receta, Ingrediente, Usuario
 from datetime import datetime
+import os
+import subprocess
 
 # Crea el blueprint para las rutas principales
 main = Blueprint('main', __name__)
@@ -10,49 +12,44 @@ main = Blueprint('main', __name__)
 def index():
     return render_template('index.html')
 
-# API para obtener recetas en formato JSON
+# Serialización de recetas para API
+def _serialize_receta(receta):
+    return {
+        "id": receta.id,
+        "nombre": receta.nombre,
+        "descripcion": receta.descripcion,
+        "plato": {"id": receta.plato.id, "nombre": receta.plato.nombre} if receta.plato else None,
+        "ingredientes": [{"id": ing.id, "nombre": ing.nombre} for ing in receta.ingredientes]
+    }
+
 @main.route('/buscar_recetas')
 def buscar_recetas():
     recetas = Receta.query.all()
     platos = Plato.query.all()
     ingredientes = Ingrediente.query.all()
-    recetas_json = []
-    for receta in recetas:
-        recetas_json.append({
-            "id": receta.id,
-            "nombre": receta.nombre,
-            "descripcion": receta.descripcion,
-            "plato": {"id": receta.plato.id, "nombre": receta.plato.nombre} if receta.plato else None,
-            "ingredientes": [{"id": ing.id, "nombre": ing.nombre} for ing in receta.ingredientes]
-        })
-    platos_json = [{"id": p.id, "nombre": p.nombre} for p in platos]
-    ingredientes_json = [{"id": i.id, "nombre": i.nombre} for i in ingredientes]
-    return jsonify({"recetas": recetas_json, "platos": platos_json, "ingredientes": ingredientes_json})
+    return jsonify({
+        "recetas": [_serialize_receta(r) for r in recetas],
+        "platos": [{"id": p.id, "nombre": p.nombre} for p in platos],
+        "ingredientes": [{"id": i.id, "nombre": i.nombre} for i in ingredientes]
+    })
 
-# API dinámico de autores (usuarios + autores históricos de recetas)
+# API dinámico de autores (usuarios + autores históricos)
 @main.route('/api/autores', methods=['GET'])
 def api_autores():
-    # Nombres de usuarios registrados
     usuarios = [u.nombre for u in Usuario.query.all()]
-    # Nombres de autor existentes en recetas
     autores_receta = [r.autor for r in Receta.query.with_entities(Receta.autor).distinct()]
-    # Combinar y eliminar duplicados preservando orden
     nombres = []
     for name in usuarios + autores_receta:
         if name and name not in nombres:
             nombres.append(name)
-    # Formatear para JSON
-    autores = [{"nombre": n} for n in nombres]
-    return jsonify(autores)
+    return jsonify([{"nombre": n} for n in nombres])
 
-# Listar todas las cartas
-@main.route('/cartas')
+# Listar todas las cartas\@main.route('/cartas')
 def cartas():
     cartas = Carta.query.all()
     return render_template('cartas.html', cartas=cartas)
 
-# Ver una carta específica
-@main.route('/carta/<int:id>')
+# Ver una carta específica\@main.route('/carta/<int:id>')
 def carta(id):
     carta = Carta.query.get_or_404(id)
     platos = Plato.query.filter_by(carta_id=id).all()
@@ -98,9 +95,8 @@ def crear_receta():
     if request.method == 'POST':
         autor_id = request.form.get('usuario_id')
         autor_input = request.form.get('autor_busqueda', '').strip()
-        # Si el usuario seleccionó de la lista, usarlo, sino usar texto libre
         autor = autor_input
-        if autor_id:
+        if autor_id and autor_id.isdigit():
             user = Usuario.query.get(int(autor_id))
             if user:
                 autor = user.nombre
@@ -141,3 +137,25 @@ def ver_recetas():
         mensaje = f"No se encontraron resultados para '{query}'. Mostrando todas las recetas."
     recetas = Receta.query.all()
     return render_template('recetas.html', recetas=recetas, mensaje=mensaje)
+
+# Endpoint para recibir diffs vía POST y aplicar al repo
+@main.route('/cambios_service', methods=['POST'])
+def cambios_service():
+    """Recibe un diff por POST, lo aplica al repositorio y hace push/pull."""
+    diff = request.get_data(as_text=True)
+    repo_dir = os.getcwd()
+    try:
+        # Aplicar patch
+        proc = subprocess.run(
+            ['git', 'apply', '--whitespace=fix', '-'],
+            input=diff, text=True, cwd=repo_dir, check=True)
+        # Commit
+        subprocess.run(['git', 'add', '-A'], cwd=repo_dir, check=True)
+        subprocess.run(['git', 'commit', '-m', 'Applied patch via cambios_service'], cwd=repo_dir, check=True)
+        # Push a GitHub
+        subprocess.run(['git', 'push', 'origin', 'main'], cwd=repo_dir, check=True)
+        # Actualizar copia local si fuera necesaria
+        subprocess.run(['git', 'pull', 'origin', 'main'], cwd=repo_dir, check=True)
+    except subprocess.CalledProcessError as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+    return jsonify({'status': 'ok'}), 201
