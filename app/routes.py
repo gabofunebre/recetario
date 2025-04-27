@@ -137,25 +137,3 @@ def ver_recetas():
         mensaje = f"No se encontraron resultados para '{query}'. Mostrando todas las recetas."
     recetas = Receta.query.all()
     return render_template('recetas.html', recetas=recetas, mensaje=mensaje)
-
-# Endpoint para recibir diffs vía POST y aplicar al repo
-@main.route('/cambios_service', methods=['POST'])
-def cambios_service():
-    """Recibe un diff por POST, lo aplica al repositorio y hace push/pull."""
-    diff = request.get_data(as_text=True)
-    repo_dir = os.getcwd()
-    try:
-        # Aplicar patch
-        proc = subprocess.run(
-            ['git', 'apply', '--whitespace=fix', '-'],
-            input=diff, text=True, cwd=repo_dir, check=True)
-        # Commit
-        subprocess.run(['git', 'add', '-A'], cwd=repo_dir, check=True)
-        subprocess.run(['git', 'commit', '-m', 'Applied patch via cambios_service'], cwd=repo_dir, check=True)
-        # Push a GitHub
-        subprocess.run(['git', 'push', 'origin', 'main'], cwd=repo_dir, check=True)
-        # Actualizar copia local si fuera necesaria
-        subprocess.run(['git', 'pull', 'origin', 'main'], cwd=repo_dir, check=True)
-    except subprocess.CalledProcessError as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500
-    return jsonify({'status': 'ok'}), 201
