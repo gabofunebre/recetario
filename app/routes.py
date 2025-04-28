@@ -33,7 +33,6 @@ def buscar_recetas():
         "ingredientes": [{"id": i.id, "nombre": i.nombre} for i in ingredientes]
     })
 
-# API dinámico de autores (usuarios + autores históricos)
 @main.route('/api/autores', methods=['GET'])
 def api_autores():
     usuarios = [u.nombre for u in Usuario.query.all()]
@@ -44,18 +43,20 @@ def api_autores():
             nombres.append(name)
     return jsonify([{"nombre": n} for n in nombres])
 
-# Listar todas las cartas\@main.route('/cartas')
+# Listar todas las cartas
+@main.route('/cartas')
 def cartas():
     cartas = Carta.query.all()
     return render_template('cartas.html', cartas=cartas)
 
-# Ver una carta específica\@main.route('/carta/<int:id>')
+# Ver una carta específica
+@main.route('/carta/<int:id>')
 def carta(id):
     carta = Carta.query.get_or_404(id)
     platos = Plato.query.filter_by(carta_id=id).all()
     return render_template('carta_actual.html', carta=carta, platos=platos)
 
-# Ver la carta actual (última)
+# Ver la carta actual (la más reciente)
 @main.route('/carta_actual')
 def carta_actual():
     carta = Carta.query.order_by(Carta.id.desc()).first()
@@ -67,8 +68,10 @@ def carta_actual():
 def crear_carta():
     recetas = Receta.query.all()
     if request.method == 'POST':
-        nombre = request.form['nombre']
-        autor = request.form['autor']
+        nombre = request.form.get('nombre', '').strip()
+        autor = request.form.get('autor', '').strip()
+        if not nombre or not autor:
+            return "Por favor, complete todos los campos", 400
         carta = Carta(nombre=nombre, autor=autor)
         db.session.add(carta)
         db.session.commit()
@@ -80,28 +83,24 @@ def crear_carta():
 def crear_plato(carta_id):
     carta = Carta.query.get_or_404(carta_id)
     if request.method == 'POST':
-        nombre = request.form['nombre']
-        ingredientes = request.form['ingredientes']
-        autor = request.form['autor']
+        nombre = request.form.get('nombre', '').strip()
+        autor = request.form.get('autor', '').strip()
+        if not nombre or not autor:
+            return "Por favor, complete todos los campos", 400
+        ingredientes = request.form.get('ingredientes', '').strip()
         plato = Plato(nombre=nombre, ingredientes=ingredientes, autor=autor, carta_id=carta.id)
         db.session.add(plato)
         db.session.commit()
         return redirect(url_for('main.cartas'))
     return render_template('crear_plato.html', carta=carta)
 
-# Crear nueva receta con autor dinámico
+# Crear nueva receta (con búsqueda de autor dinámica)
 @main.route('/crear_receta', methods=['GET', 'POST'])
 def crear_receta():
     if request.method == 'POST':
-        autor_id = request.form.get('usuario_id')
-        autor_input = request.form.get('autor_busqueda', '').strip()
-        autor = autor_input
-        if autor_id and autor_id.isdigit():
-            user = Usuario.query.get(int(autor_id))
-            if user:
-                autor = user.nombre
-        nombre = request.form['nombre']
-        metodo = request.form['metodo']
+        nombre = request.form.get('nombre', '').strip()
+        autor = request.form.get('autor', '').strip()
+        metodo = request.form.get('metodo', '').strip()
         ingredientes_data = request.form.getlist('ingredientes[]')
         cantidades_data = request.form.getlist('cantidades[]')
         unidades_data = request.form.getlist('unidades[]')
@@ -134,6 +133,6 @@ def ver_recetas():
     query = request.args.get('q')
     mensaje = None
     if query:
-        mensaje = f"No se encontraron resultados para '{query}'. Mostrando todas las recetas."
+        mensaje = f"No se encontraron resultados para '{query}'. Mostrando todas las recetas."  
     recetas = Receta.query.all()
     return render_template('recetas.html', recetas=recetas, mensaje=mensaje)

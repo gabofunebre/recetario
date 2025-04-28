@@ -6,29 +6,20 @@
   <h1 class="mb-4">Crear Nueva Receta</h1>
 
   <form method="POST">
-    <div class="row g-3 mb-3">
-      <div class="col-md-6">
+    <div class="row g-3 mb-4">
+      <div class="col-md-8">
         <label for="nombre" class="form-label">Nombre de la Receta</label>
-        <input type="text" id="nombre" name="nombre" class="form-control" required>
+        <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Ej. Paella Valenciana" required>
       </div>
-      <div class="col-md-6 position-relative">
-        <label for="autor_busqueda" class="form-label">Autor</label>
-        <input type="text" id="autor_busqueda" class="form-control" placeholder="Buscar usuario...">
-        <input type="hidden" name="usuario_id" id="usuario_id">
-        <div id="resultados_usuarios" class="list-group position-absolute w-100 mt-1"></div>
-        <small class="form-text text-muted">O ingresa un autor libre a continuación:</small>
-        <input type="text" id="autor_libre" name="autor_libre" class="form-control mt-2" placeholder="Nombre del autor libre">
+      <div class="col-md-4 position-relative">
+        <label for="autor" class="form-label">Autor</label>
+        <input type="text" id="autor" name="autor" class="form-control" placeholder="Buscar o ingresa autor" autocomplete="off" required>
+        <div id="resultados_autores" class="list-group position-absolute w-100 mt-1"></div>
       </div>
     </div>
 
-    <div class="mb-4">
-      <label for="metodo" class="form-label">Método de Preparación</label>
-      <textarea id="metodo" name="metodo" class="form-control" rows="4" required></textarea>
-    </div>
-
-    <hr>
     <h3 class="mb-3">Ingredientes</h3>
-    <div id="ingredientes-container">
+    <div id="ingredientes-container" class="mb-4">
       <div class="row g-2 align-items-end mb-2 ingrediente">
         <div class="col-md-5">
           <label class="form-label">Ingrediente</label>
@@ -57,17 +48,75 @@
         </div>
       </div>
     </div>
-
     <div class="mb-4">
       <button type="button" class="btn btn-secondary" id="btn-agregar">Agregar Ingrediente</button>
     </div>
 
-    <div class="d-grid">
+    <h3 class="mb-3">Método de Preparación</h3>
+    <div class="mb-4">
+      <textarea id="metodo" name="metodo" class="form-control" rows="5" placeholder="Describe paso a paso cómo preparar la receta" required></textarea>
+    </div>
+
+    <div class="d-grid mb-4">
       <button type="submit" class="btn btn-primary btn-lg">Crear Receta</button>
     </div>
   </form>
 
-  <div class="mt-4">
+  <div>
     <a href="{{ url_for('main.index') }}" class="link-secondary">Volver a la página principal</a>
   </div>
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let autores = [];
+      fetch('{{ url_for('main.api_autores') }}')
+        .then(res => res.json())
+        .then(data => {
+          autores = data.map(item => item.nombre);
+          window.fuseAutores = new Fuse(autores, { threshold: 0.3 });
+        });
+
+      const inputAutor = document.getElementById('autor');
+      const lista = document.getElementById('resultados_autores');
+
+      inputAutor.addEventListener('input', () => {
+        const term = inputAutor.value.trim();
+        lista.innerHTML = '';
+        if (term.length < 1 || !window.fuseAutores) return;
+        const resultados = window.fuseAutores.search(term).slice(0, 5).map(r => r.item);
+        resultados.forEach(nombre => {
+          const btn = document.createElement('button');
+          btn.type = 'button'; btn.className = 'list-group-item list-group-item-action';
+          btn.textContent = nombre;
+          btn.addEventListener('click', () => {
+            inputAutor.value = nombre;
+            lista.innerHTML = '';
+          });
+          lista.appendChild(btn);
+        });
+      });
+
+      document.addEventListener('click', e => {
+        if (!lista.contains(e.target) && e.target !== inputAutor) lista.innerHTML = '';
+      });
+
+      // Manejo de ingredientes dinámicos
+      const contenedor = document.getElementById('ingredientes-container');
+      document.getElementById('btn-agregar').addEventListener('click', () => {
+        const original = contenedor.querySelector('.ingrediente');
+        const clon = original.cloneNode(true);
+        clon.querySelectorAll('input, select').forEach(el => el.value = '');
+        contenedor.appendChild(clon);
+      });
+      contenedor.addEventListener('click', e => {
+        if (e.target.classList.contains('btn-remove')) {
+          const rows = contenedor.querySelectorAll('.ingrediente');
+          if (rows.length > 1) e.target.closest('.ingrediente').remove();
+        }
+      });
+    });
+  </script>
 {% endblock %}
