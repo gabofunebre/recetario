@@ -102,21 +102,6 @@
       document.addEventListener('click', e => {
         if (!lista.contains(e.target) && e.target !== inputAutor) lista.innerHTML = '';
       });
-
-      // Manejo de ingredientes dinámicos
-      const contenedor = document.getElementById('ingredientes-container');
-      document.getElementById('btn-agregar').addEventListener('click', () => {
-        const original = contenedor.querySelector('.ingrediente');
-        const clon = original.cloneNode(true);
-        clon.querySelectorAll('input, select').forEach(el => el.value = '');
-        contenedor.appendChild(clon);
-      });
-      contenedor.addEventListener('click', e => {
-        if (e.target.classList.contains('btn-remove')) {
-          const rows = contenedor.querySelectorAll('.ingrediente');
-          if (rows.length > 1) e.target.closest('.ingrediente').remove();
-        }
-      });
     });
   </script>
 {% endblock %}
