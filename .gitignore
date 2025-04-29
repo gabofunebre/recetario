@@ -40,6 +40,4 @@ volumes/
 instance/
 
 # Archivos de seeds o pruebas si no querés subirlos
-seed.py
 test_*.py
-cambios_service.py

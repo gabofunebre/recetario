@@ -5,7 +5,7 @@
 {% block content %}
   <h1 class="mb-4">Crear Nueva Receta</h1>
 
-  <form method="POST">
+  <form method="POST" id="form-receta" data-api-autores="{{ url_for('main.api_autores') }}">
     <div class="row g-3 mb-4">
       <div class="col-md-8">
         <label for="nombre" class="form-label">Nombre de la Receta</label>
@@ -69,39 +69,4 @@
 
 {% block scripts %}
   {{ super() }}
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      let autores = [];
-      fetch('{{ url_for('main.api_autores') }}')
-        .then(res => res.json())
-        .then(data => {
-          autores = data.map(item => item.nombre);
-          window.fuseAutores = new Fuse(autores, { threshold: 0.3 });
-        });
-
-      const inputAutor = document.getElementById('autor');
-      const lista = document.getElementById('resultados_autores');
-
-      inputAutor.addEventListener('input', () => {
-        const term = inputAutor.value.trim();
-        lista.innerHTML = '';
-        if (term.length < 1 || !window.fuseAutores) return;
-        const resultados = window.fuseAutores.search(term).slice(0, 5).map(r => r.item);
-        resultados.forEach(nombre => {
-          const btn = document.createElement('button');
-          btn.type = 'button'; btn.className = 'list-group-item list-group-item-action';
-          btn.textContent = nombre;
-          btn.addEventListener('click', () => {
-            inputAutor.value = nombre;
-            lista.innerHTML = '';
-          });
-          lista.appendChild(btn);
-        });
-      });
-
-      document.addEventListener('click', e => {
-        if (!lista.contains(e.target) && e.target !== inputAutor) lista.innerHTML = '';
-      });
-    });
-  </script>
 {% endblock %}
