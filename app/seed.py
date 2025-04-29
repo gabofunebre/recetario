@@ -1,58 +1,97 @@
-#!/usr/bin/env python3
-"""
-Script de semillas (seed) para poblar la base de datos con datos de prueba.
-Ejecutar desde la raíz del proyecto:
+# seed.py - Población inicial de datos para Recetario con modelo Carta → Seccion → Plato → Receta → Ingrediente
 
-    python seed.py
-"""
-from app import create_app, db
-from app.models import Usuario, Carta, Plato, Receta, Ingrediente
 from datetime import datetime
+from app import create_app, db
+from app.models import Usuario, Carta, Seccion, Plato, Receta, Ingrediente
 
-# Inicializar la app y el contexto
-app = create_app()
-with app.app_context():
-    # Opcional: limpiar la base de datos
-    db.drop_all()
-    db.create_all()
 
-    # Crear usuarios de prueba
-    usuarios = [
-        Usuario(nombre='Alice', posicion='Chef Ejecutivo'),
-        Usuario(nombre='Bob', posicion='Sous Chef'),
-        Usuario(nombre='Carlos', posicion='Pastelero'),
-    ]
-    db.session.add_all(usuarios)
+def seed():
+    app = create_app()
+    with app.app_context():
+        # Reinicia la base de datos
+        db.drop_all()
+        db.create_all()
 
-    # Crear cartas
-    carta1 = Carta(nombre='Menú de Verano', autor='Alice', fecha=datetime(2025, 6, 1))
-    carta2 = Carta(nombre='Menú de Invierno', autor='Bob', fecha=datetime(2025, 12, 1))
-    db.session.add_all([carta1, carta2])
-    db.session.flush()
+        # --- Usuarios de ejemplo ---
+        alice = Usuario(nombre='Alice', posicion='Chef Principal')
+        bob = Usuario(nombre='Bob', posicion='Sous Chef')
+        db.session.add_all([alice, bob])
+        db.session.flush()
 
-    # Crear platos para las cartas
-    plato1 = Plato(nombre='Ensalada Fresca', ingredientes='Lechuga, Tomate, Pepino', autor='Alice', carta_id=carta1.id)
-    plato2 = Plato(nombre='Sopa Caliente', ingredientes='Calabaza, Zanahoria, Jengibre', autor='Bob', carta_id=carta2.id)
-    db.session.add_all([plato1, plato2])
-    db.session.flush()
+        # --- Carta de prueba ---
+        carta = Carta(
+            nombre='Carta de Prueba',
+            autor='Alice',
+            fecha=datetime.utcnow().date()
+        )
+        db.session.add(carta)
+        db.session.flush()
 
-    # Crear recetas genéricas
-    receta1 = Receta(nombre='Hamburguesa Clásica', autor='Carlos', descripcion='Una hamburguesa jugosa con queso y verduras.', metodo='1. Formar carne. 2. Asar. 3. Montar burguer.')
-    receta2 = Receta(nombre='Pasta al Pesto', autor='Alice', descripcion='Pasta fresca con salsa pesto casera.', metodo='1. Cocer pasta. 2. Mezclar pesto.')
-    db.session.add_all([receta1, receta2])
-    db.session.flush()
+        # --- Sección General ---
+        seccion = Seccion(
+            nombre='General',
+            carta_id=carta.id
+        )
+        db.session.add(seccion)
+        db.session.flush()
 
-    # Asociar ingredientes detallados a las recetas
-    ingredientes_seed = [
-        Ingrediente(nombre='Carne molida', cantidad='200', unidad='gramos', receta_id=receta1.id),
-        Ingrediente(nombre='Pan de hamburguesa', cantidad='2', unidad='unidad', receta_id=receta1.id),
-        Ingrediente(nombre='Queso cheddar', cantidad='2', unidad='rebanadas', receta_id=receta1.id),
-        Ingrediente(nombre='Pasta italiana', cantidad='150', unidad='gramos', receta_id=receta2.id),
-        Ingrediente(nombre='Albahaca', cantidad='30', unidad='gramos', receta_id=receta2.id),
-        Ingrediente(nombre='Aceite de oliva', cantidad='50', unidad='ml', receta_id=receta2.id),
-    ]
-    db.session.add_all(ingredientes_seed)
+        # --- Plato y Receta: Tortilla de Patatas ---
+        plato1 = Plato(
+            nombre='Tortilla de Patatas',
+            descripcion='Tortilla española clásica',
+            seccion_id=seccion.id
+        )
+        db.session.add(plato1)
+        db.session.flush()
 
-    # Confirmar cambios
-    db.session.commit()
-    print('✅ Base de datos poblada con datos de prueba.')
+        receta1 = Receta(
+            nombre='Tortilla de Patatas',
+            autor='Alice',
+            descripcion='Receta básica de tortilla de patatas.',
+            metodo='1. Pelar y cortar patatas; 2. Freír; 3. Batir huevos; 4. Cuajar',
+            plato_id=plato1.id
+        )
+        db.session.add(receta1)
+        db.session.flush()
+
+        ingredientes1 = [
+            Ingrediente(nombre='Patatas', cantidad='500', unidad='gramos', receta_id=receta1.id),
+            Ingrediente(nombre='Huevos', cantidad='4', unidad='unidad', receta_id=receta1.id),
+            Ingrediente(nombre='Cebolla', cantidad='1', unidad='unidad', receta_id=receta1.id)
+        ]
+        db.session.add_all(ingredientes1)
+
+        # --- Plato y Receta: Gazpacho Andaluz ---
+        plato2 = Plato(
+            nombre='Gazpacho Andaluz',
+            descripcion='Sopa fría de verduras',
+            seccion_id=seccion.id
+        )
+        db.session.add(plato2)
+        db.session.flush()
+
+        receta2 = Receta(
+            nombre='Gazpacho Andaluz',
+            autor='Bob',
+            descripcion='Refrescante gazpacho.',
+            metodo='1. Cortar verduras; 2. Triturar; 3. Enfriar',
+            plato_id=plato2.id
+        )
+        db.session.add(receta2)
+        db.session.flush()
+
+        ingredientes2 = [
+            Ingrediente(nombre='Tomate', cantidad='1', unidad='kilogramo', receta_id=receta2.id),
+            Ingrediente(nombre='Pepino', cantidad='1', unidad='unidad', receta_id=receta2.id),
+            Ingrediente(nombre='Pimiento Verde', cantidad='1', unidad='unidad', receta_id=receta2.id)
+        ]
+        db.session.add_all(ingredientes2)
+
+        # Confirmar todo
+        db.session.commit()
+
+        print('Seed: datos iniciales creados correctamente.')
+
+
+if __name__ == '__main__':
+    seed()

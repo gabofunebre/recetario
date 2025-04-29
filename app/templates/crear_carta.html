@@ -5,27 +5,79 @@
 {% block content %}
   <h1 class="mb-4">Crear Nueva Carta</h1>
 
-  <form method="POST">
+  <form id="form-carta" method="POST">
     <div class="mb-3">
-      <label for="nombre" class="form-label">Nombre de la Carta</label>
-      <input type="text" id="nombre" name="nombre" class="form-control" required>
+      <label for="carta-nombre" class="form-label">Nombre de la Carta</label>
+      <input type="text" id="carta-nombre" class="form-control" required>
     </div>
 
-    <div class="mb-3">
-      <label for="autor" class="form-label">Autor</label>
-      <input type="text" id="autor" name="autor" class="form-control" required>
-    </div>
+    <h3>Secciones</h3>
+    <div id="secciones-container"></div>
 
-    <div class="mb-3">
-      <label for="recetas" class="form-label">Seleccionar Recetas</label>
-      <select name="recetas" id="recetas" class="form-select" required>
-        {% for receta in recetas %}
-          <option value="{{ receta.id }}">{{ receta.nombre }}</option>
-        {% endfor %}
-      </select>
-    </div>
+    <button
+      type="button"
+      id="btn-agregar-seccion"
+      class="btn btn-secondary mb-4"
+    >
+      + Agregar Sección
+    </button>
 
-    <button type="submit" class="btn btn-primary">Crear Carta</button>
-    <a href="{{ url_for('main.index') }}" class="btn btn-secondary ms-2">Volver</a>
+    <!-- Este campo oculto se rellenará con la estructura JSON antes de enviar -->
+    <input type="hidden" name="payload" id="payload">
+
+    <div class="d-grid">
+      <button type="submit" class="btn btn-primary btn-lg">
+        Crear Carta
+      </button>
+    </div>
   </form>
+
+  <!-- Modal Bootstrap para crear un Plato dentro de la sección activa -->
+  <div class="modal fade" id="modalPlato" tabindex="-1">
+    <div class="modal-dialog">
+      <form id="form-plato" class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Nuevo Plato</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="plato-nombre" class="form-label">Nombre Plato</label>
+            <input
+              type="text"
+              id="plato-nombre"
+              class="form-control"
+              required
+            >
+          </div>
+          <div class="mb-3">
+            <label for="plato-descripcion" class="form-label">
+              Descripción Plato
+            </label>
+            <textarea
+              id="plato-descripcion"
+              class="form-control"
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary">
+            Añadir Plato
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
 {% endblock %}

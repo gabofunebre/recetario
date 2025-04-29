@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
@@ -6,6 +7,9 @@ db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
+
+    # Clave secreta necesaria para sesiones (flash, login, etc.)
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev_secret_key')
 
     # Configuración de la URI de la base de datos
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///recetario.db'

@@ -56,14 +56,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if (formReceta) {
     const apiAutoresUrl = formReceta.dataset.apiAutores;
     let fuseAutores;
-    let autoresData = [];
 
     if (apiAutoresUrl) {
       fetch(apiAutoresUrl)
         .then(res => res.json())
         .then(data => {
-          autoresData = data;
-          fuseAutores = new Fuse(autoresData, { keys: ['nombre'], threshold: 0.3 });
+          fuseAutores = new Fuse(data, { keys: ['nombre'], threshold: 0.3 });
         })
         .catch(err => console.error('Error al cargar autores:', err));
     }
@@ -116,5 +114,91 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     });
+  }
+
+  // ------------------- CREAR CARTA: SECCIONES & PLATOS -------------------
+  const formCarta = document.getElementById('form-carta');
+  if (formCarta) {
+    const contSecciones = document.getElementById('secciones-container');
+    const btnAddSeccion = document.getElementById('btn-agregar-seccion');
+    const inputNombreCarta = document.getElementById('carta-nombre');
+    const inputPayload = document.getElementById('payload');
+    const modalPlatoEl = document.getElementById('modalPlato');
+    const formPlato = document.getElementById('form-plato');
+    let seccionActivaIdx = null;
+
+    // Estructura en memoria
+    const data = { nombreCarta: '', secciones: [] };
+
+    const renderSecciones = () => {
+      contSecciones.innerHTML = '';
+      data.secciones.forEach((sec, idx) => {
+        const card = document.createElement('div');
+        card.className = 'card mb-3';
+        card.innerHTML = `
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <input type="text" class="form-control me-2 seccion-nombre"
+                     placeholder="Nombre de la sección" value="${sec.nombre || ''}">
+              <button class="btn btn-danger btn-eliminar-seccion">&times;</button>
+            </div>
+            <h6>Platos</h6>
+            <ul class="list-group mb-2">
+              ${sec.platos.map(p => `<li class="list-group-item">
+                <strong>${p.nombre}</strong><br><small>${p.descripcion}</small>
+              </li>`).join('')}
+            </ul>
+            <button class="btn btn-outline-primary btn-agregar-plato">
+              + Agregar Plato
+            </button>
+          </div>`;
+        contSecciones.appendChild(card);
+
+        // Eventos
+        const inputSecNombre = card.querySelector('.seccion-nombre');
+        inputSecNombre.addEventListener('input', e => {
+          data.secciones[idx].nombre = e.target.value;
+        });
+        card.querySelector('.btn-eliminar-seccion').addEventListener('click', () => {
+          data.secciones.splice(idx,1);
+          renderSecciones();
+        });
+        card.querySelector('.btn-agregar-plato').addEventListener('click', () => {
+          seccionActivaIdx = idx;
+          new bootstrap.Modal(modalPlatoEl).show();
+        });
+      });
+    };
+
+    btnAddSeccion.addEventListener('click', () => {
+      data.secciones.push({ nombre: '', platos: [] });
+      renderSecciones();
+    });
+
+    // Submit Plato desde modal
+    formPlato.addEventListener('submit', e => {
+      e.preventDefault();
+      const nombre = document.getElementById('plato-nombre').value.trim();
+      const desc = document.getElementById('plato-descripcion').value.trim();
+      if (nombre && seccionActivaIdx !== null) {
+        data.secciones[seccionActivaIdx].platos.push({ nombre, descripcion: desc });
+        renderSecciones();
+      }
+      bootstrap.Modal.getInstance(modalPlatoEl).hide();
+      formPlato.reset();
+    });
+
+    // Antes de enviar la carta
+    formCarta.addEventListener('submit', e => {
+      data.nombreCarta = inputNombreCarta.value.trim();
+      if (!data.nombreCarta) {
+        e.preventDefault();
+        return alert('La carta necesita un nombre.');
+      }
+      inputPayload.value = JSON.stringify(data);
+    });
+
+    // Iniciar con una sección vacía
+    btnAddSeccion.click();
   }
 });

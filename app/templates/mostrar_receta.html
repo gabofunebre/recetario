@@ -22,7 +22,9 @@
           {% for ing in receta.ingredientes %}
             <tr>
               <td>{{ ing.nombre }}</td>
-              <td>{{ ing.cantidad }}{{ ing.unidad if ing.unidad }}</td>
+              <td>
+                {{ ing.cantidad }}{% if ing.unidad %} {{ ing.unidad }}{% endif %}
+              </td>
             </tr>
           {% endfor %}
         </tbody>
@@ -42,5 +44,8 @@
     </div>
   {% endif %}
 
-  <a href="{{ url_for('main.ver_recetas') }}" class="btn btn-secondary">Volver a Recetas</a>
+  <div class="d-flex gap-2">
+  <a href="{{ url_for('main.ver_recetas') }}" class="btn btn-secondary">Todas las Recetas</a>
+  <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary">Volver al Buscador</a>
+</div>
 {% endblock %}

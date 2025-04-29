@@ -1,91 +1,114 @@
-# seed.py - Población inicial de datos para Recetario
-# Ajusta la URI de la base de datos según tu configuración
+# seed.py - Población inicial con nueva estructura Carta → Seccion → Plato → Receta → Ingrediente
 
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-
-# Importa tus modelos y la instancia de db
-from routes import db
-from models import Usuario, Receta, Ingrediente, Plato, Carta
-
-
-def create_app():
-    app = Flask(__name__)
-    # Usa la variable de entorno DATABASE_URL o sqlite por defecto
-    app.config['SQLALCHEMY_DATABASE_URI'] = (
-        # Para PostgreSQL o MySQL puedes usar una URL completa
-        # Ej: os.getenv('DATABASE_URL', 'sqlite:///recetario.db')
-        'sqlite:///recetario.db'
-    )
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    db.init_app(app)
-    return app
+from app import create_app, db
+from app.models import Usuario, Carta, Seccion, Plato, Receta, Ingrediente
 
 
 def seed():
     app = create_app()
     with app.app_context():
-        # Reinicia la base de datos
+        # Borrar y crear tablas
         db.drop_all()
         db.create_all()
 
-        # --- Usuarios ---
-        u1 = Usuario(nombre='Alice', posicion='Chef Principal')
-        u2 = Usuario(nombre='Bob', posicion='Sous Chef')
-        db.session.add_all([u1, u2])
+        # Usuarios de ejemplo
+        alice = Usuario(nombre='Alice', posicion='Chef Principal')
+        bob   = Usuario(nombre='Bob', posicion='Sous Chef')
+        db.session.add_all([alice, bob])
+        db.session.flush()
 
-        # --- Recetas y sus ingredientes ---
-        r1 = Receta(
-            nombre='Tortilla de Patatas',
+        # Carta de prueba
+        carta = Carta(
+            nombre='Carta de Prueba',
             autor='Alice',
-            descripcion='Clásica tortilla española con patatas y cebolla.',
-            metodo='1. Pelar y cortar patatas. 2. Freír en aceite. 3. Batir huevos. 4. Mezclar todo y cuajar.'
+            fecha=datetime.utcnow().date()
         )
-        db.session.add(r1)
-        db.session.flush()  # Para obtener r1.id
-        i1 = Ingrediente(nombre='Patatas', cantidad='500', unidad='gramos', receta_id=r1.id)
-        i2 = Ingrediente(nombre='Huevos', cantidad='4', unidad='unidad', receta_id=r1.id)
-        i3 = Ingrediente(nombre='Cebolla', cantidad='1', unidad='unidad', receta_id=r1.id)
-        db.session.add_all([i1, i2, i3])
-
-        r2 = Receta(
-            nombre='Gazpacho Andaluz',
-            autor='Bob',
-            descripcion='Sopa fría de tomate ideal para verano.',
-            metodo='1. Lumpiar y cortar verduras. 2. Triturar todo. 3. Enfriar en nevera.'
-        )
-        db.session.add(r2)
-        db.session.flush()
-        i4 = Ingrediente(nombre='Tomate', cantidad='1', unidad='kilogramo', receta_id=r2.id)
-        i5 = Ingrediente(nombre='Pepino', cantidad='1', unidad='unidad', receta_id=r2.id)
-        i6 = Ingrediente(nombre='Pimiento Verde', cantidad='1', unidad='unidad', receta_id=r2.id)
-        db.session.add_all([i4, i5, i6])
-
-        # Guarda las recetas primeras
-        db.session.commit()
-
-        # --- Carta y Platos ---
-        c1 = Carta(nombre='Carta de Hoy', autor='Alice', fecha=datetime.utcnow().date())
-        db.session.add(c1)
+        db.session.add(carta)
         db.session.flush()
 
-        # Crea platos basados en las recetas anteriores
+        # Sección de Entradas
+        entradas = Seccion(
+            nombre='Entradas',
+            carta_id=carta.id
+        )
+        db.session.add(entradas)
+        db.session.flush()
+
+        # Plato: Ensalada César
         plato1 = Plato(
-            nombre=r1.nombre,
-            ingredientes=', '.join([ing.nombre for ing in r1.ingredientes]),
-            autor=r1.autor,
-            carta_id=c1.id
+            nombre='Ensalada César',
+            descripcion='Lechuga, pollo, queso y aderezo casero',
+            seccion_id=entradas.id
         )
-        plato2 = Plato(
-            nombre=r2.nombre,
-            ingredientes=', '.join([ing.nombre for ing in r2.ingredientes]),
-            autor=r2.autor,
-            carta_id=c1.id
-        )
-        db.session.add_all([plato1, plato2])
+        db.session.add(plato1)
+        db.session.flush()
 
-        # Confirma todos los cambios
+        # Receta asociada al plato
+        receta1 = Receta(
+            nombre='Aderezo César',
+            autor='Alice',
+            descripcion='Salsa clásica para la ensalada',
+            metodo='Mezclar aceite, huevo, anchoas, limón y parmesano',
+            plato_id=plato1.id
+        )
+        db.session.add(receta1)
+        db.session.flush()
+
+        # Ingredientes de la receta
+        ingredientes_receta1 = [
+            Ingrediente(nombre='Aceite de Oliva', cantidad='100', unidad='ml', receta_id=receta1.id),
+            Ingrediente(nombre='Huevo', cantidad='1', unidad='unidad', receta_id=receta1.id),
+            Ingrediente(nombre='Anchoas', cantidad='4', unidad='filetes', receta_id=receta1.id)
+        ]
+        db.session.add_all(ingredientes_receta1)
+
+        # Sección de Principales
+        principales = Seccion(
+            nombre='Principales',
+            carta_id=carta.id
+        )
+        db.session.add(principales)
+        db.session.flush()
+
+        # Plato: Pollo al Horno
+        plato2 = Plato(
+            nombre='Pollo al Horno',
+            descripcion='Pollo marinado y al horno con hierbas',
+            seccion_id=principales.id
+        )
+        db.session.add(plato2)
+        db.session.flush()
+
+        # Recetas: Salsa y Guarnición
+        salsa = Receta(
+            nombre='Salsa de Hierbas',
+            autor='Bob',
+            descripcion='Salsa para el pollo',
+            metodo='Mezclar crema, hierbas frescas y ajo',
+            plato_id=plato2.id
+        )
+        papas = Receta(
+            nombre='Papas Asadas',
+            autor='Bob',
+            descripcion='Papas al horno con romero',
+            metodo='Cortar papas, sazonar y hornear',
+            plato_id=plato2.id
+        )
+        db.session.add_all([salsa, papas])
+        db.session.flush()
+
+        ingredientes_salsa = [
+            Ingrediente(nombre='Crema', cantidad='200', unidad='ml', receta_id=salsa.id),
+            Ingrediente(nombre='Hierbas', cantidad='10', unidad='gramos', receta_id=salsa.id)
+        ]
+        ingredientes_papas = [
+            Ingrediente(nombre='Papas', cantidad='500', unidad='gramos', receta_id=papas.id),
+            Ingrediente(nombre='Romero', cantidad='5', unidad='gramos', receta_id=papas.id)
+        ]
+        db.session.add_all(ingredientes_salsa + ingredientes_papas)
+
+        # Confirmar cambios
         db.session.commit()
 
         print('Seed: datos iniciales creados correctamente.')

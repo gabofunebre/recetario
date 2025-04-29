@@ -1,11 +1,8 @@
-from flask import render_template, request, redirect, url_for, Blueprint, jsonify
+from flask import render_template, request, redirect, url_for, Blueprint, jsonify, flash
 from . import db
-from .models import Carta, Plato, Receta, Ingrediente, Usuario
-from datetime import datetime
-import os
-import subprocess
+from .models import Usuario, Carta, Seccion, Plato, Receta, Ingrediente
+import json
 
-# Crea el blueprint para las rutas principales
 main = Blueprint('main', __name__)
 
 @main.route('/')
@@ -43,58 +40,67 @@ def api_autores():
             nombres.append(name)
     return jsonify([{"nombre": n} for n in nombres])
 
-# Listar todas las cartas
 @main.route('/cartas')
 def cartas():
-    cartas = Carta.query.all()
+    cartas = Carta.query.order_by(Carta.id.desc()).all()
     return render_template('cartas.html', cartas=cartas)
 
-# Ver una carta específica
 @main.route('/carta/<int:id>')
 def carta(id):
     carta = Carta.query.get_or_404(id)
-    platos = Plato.query.filter_by(carta_id=id).all()
-    return render_template('carta_actual.html', carta=carta, platos=platos)
+    secciones = Seccion.query.filter_by(carta_id=carta.id).all()
+    return render_template('carta_actual.html', carta=carta, secciones=secciones)
 
-# Ver la carta actual (la más reciente)
 @main.route('/carta_actual')
 def carta_actual():
     carta = Carta.query.order_by(Carta.id.desc()).first()
-    platos = Plato.query.filter_by(carta_id=carta.id).all() if carta else []
-    return render_template('carta_actual.html', carta=carta, platos=platos)
+    secciones = Seccion.query.filter_by(carta_id=carta.id).all() if carta else []
+    return render_template('carta_actual.html', carta=carta, secciones=secciones)
 
-# Crear nueva carta
 @main.route('/crear_carta', methods=['GET', 'POST'])
 def crear_carta():
-    recetas = Receta.query.all()
     if request.method == 'POST':
-        nombre = request.form.get('nombre', '').strip()
-        autor = request.form.get('autor', '').strip()
-        if not nombre or not autor:
-            return "Por favor, complete todos los campos", 400
-        carta = Carta(nombre=nombre, autor=autor)
+        payload = request.form.get('payload')
+        if not payload:
+            flash('Datos inválidos para crear la carta', 'danger')
+            return redirect(url_for('main.crear_carta'))
+        data = json.loads(payload)
+        # 1) Crear la carta (sin autor por ahora)
+        carta = Carta(nombre=data.get('nombreCarta'), autor=None)
         db.session.add(carta)
+        db.session.flush()
+        # 2) Crear secciones y platos
+        for sec in data.get('secciones', []):
+            seccion = Seccion(nombre=sec.get('nombre'), carta_id=carta.id)
+            db.session.add(seccion)
+            db.session.flush()
+            for p in sec.get('platos', []):
+                plato = Plato(
+                    nombre=p.get('nombre'),
+                    descripcion=p.get('descripcion'),
+                    seccion_id=seccion.id
+                )
+                db.session.add(plato)
         db.session.commit()
+        flash('Carta creada correctamente.', 'success')
         return redirect(url_for('main.cartas'))
-    return render_template('crear_carta.html', recetas=recetas)
+    return render_template('crear_carta.html')
 
-# Crear nuevo plato para una carta
 @main.route('/crear_plato/<int:carta_id>', methods=['GET', 'POST'])
 def crear_plato(carta_id):
     carta = Carta.query.get_or_404(carta_id)
     if request.method == 'POST':
         nombre = request.form.get('nombre', '').strip()
-        autor = request.form.get('autor', '').strip()
-        if not nombre or not autor:
+        descripcion = request.form.get('descripcion', '').strip()
+        if not nombre:
             return "Por favor, complete todos los campos", 400
-        ingredientes = request.form.get('ingredientes', '').strip()
-        plato = Plato(nombre=nombre, ingredientes=ingredientes, autor=autor, carta_id=carta.id)
+        # Ahora Plato requiere seccion_id, lanzar error o escoger primera sección
+        plato = Plato(nombre=nombre, descripcion=descripcion, seccion_id=None)
         db.session.add(plato)
         db.session.commit()
         return redirect(url_for('main.cartas'))
     return render_template('crear_plato.html', carta=carta)
 
-# Crear nueva receta (con búsqueda de autor dinámica)
 @main.route('/crear_receta', methods=['GET', 'POST'])
 def crear_receta():
     if request.method == 'POST':
@@ -121,13 +127,11 @@ def crear_receta():
         return redirect(url_for('main.ver_recetas'))
     return render_template('crear_receta_independiente.html')
 
-# Mostrar detalle de una receta
 @main.route('/receta/<int:id>')
 def mostrar_receta(id):
     receta = Receta.query.get_or_404(id)
     return render_template('mostrar_receta.html', receta=receta)
 
-# Vista de recetas con mensaje opcional
 @main.route('/recetas')
 def ver_recetas():
     query = request.args.get('q')
