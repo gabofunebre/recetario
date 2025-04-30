@@ -3,34 +3,32 @@
 {% block title %}Crear Receta{% endblock %}
 
 {% block content %}
-  <h1 class="mb-4">Crear Nueva Receta</h1>
+  <h1 class="mb-4">Nueva Receta</h1>
 
   <form method="POST" id="form-receta" data-api-autores="{{ url_for('main.api_autores') }}">
     <div class="row g-3 mb-4">
       <div class="col-md-8">
-        <label for="nombre" class="form-label">Nombre de la Receta</label>
-        <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Ej. Paella Valenciana" required>
+        <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Nombre de la Receta" required>
       </div>
       <div class="col-md-4 position-relative">
-        <label for="autor" class="form-label">Autor</label>
-        <input type="text" id="autor" name="autor" class="form-control" placeholder="Buscar o ingresa autor" autocomplete="off" required>
+        <input type="text" id="autor" name="autor" class="form-control" placeholder="Autor" autocomplete="off" required>
         <div id="resultados_autores" class="list-group position-absolute w-100 mt-1"></div>
       </div>
     </div>
 
-    <h3 class="mb-3">Ingredientes</h3>
+    <div class="mb-4">
+      <textarea id="descripcion" name="descripcion" class="form-control" rows="2" placeholder="Descripción breve"></textarea>
+    </div>
+
     <div id="ingredientes-container" class="mb-4">
       <div class="row g-2 align-items-end mb-2 ingrediente">
         <div class="col-md-5">
-          <label class="form-label">Ingrediente</label>
-          <input type="text" name="ingredientes[]" class="form-control" placeholder="Ej. Harina" required>
+          <input type="text" name="ingredientes[]" class="form-control" placeholder="Ingrediente" required>
         </div>
         <div class="col-md-3">
-          <label class="form-label">Cantidad</label>
-          <input type="number" name="cantidades[]" class="form-control" placeholder="Ej. 100" required>
+          <input type="number" name="cantidades[]" class="form-control" placeholder="Cantidad" required>
         </div>
         <div class="col-md-3">
-          <label class="form-label">Unidad</label>
           <select name="unidades[]" class="form-select">
             <option value="gramos">Gramos</option>
             <option value="kilogramos">Kilogramos</option>
@@ -52,9 +50,8 @@
       <button type="button" class="btn btn-secondary" id="btn-agregar">Agregar Ingrediente</button>
     </div>
 
-    <h3 class="mb-3">Método de Preparación</h3>
     <div class="mb-4">
-      <textarea id="metodo" name="metodo" class="form-control" rows="5" placeholder="Describe paso a paso cómo preparar la receta" required></textarea>
+      <textarea id="metodo" name="metodo" class="form-control" rows="5" placeholder="Método de Preparación" required></textarea>
     </div>
 
     <div class="d-grid mb-4">

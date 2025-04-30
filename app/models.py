@@ -79,8 +79,8 @@ class Receta(db.Model):
     descripcion = db.Column(db.Text, nullable=True)
     metodo = db.Column(db.Text, nullable=False)
 
-    # Clave foránea a Plato
-    plato_id = db.Column(db.Integer, db.ForeignKey('platos.id'), nullable=False)
+    # Clave foránea a Plato (ahora opcional para recetas independientes)
+    plato_id = db.Column(db.Integer, db.ForeignKey('platos.id'), nullable=True)
     plato = db.relationship('Plato', back_populates='recetas')
 
     # Relación con Ingredientes

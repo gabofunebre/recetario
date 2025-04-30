@@ -3,16 +3,13 @@
 {% block title %}Recetario{% endblock %}
 
 {% block content %}
-  <h1 class="mb-4">Recetario</h1>
-
-  <div class="mb-3">
+  <div class="position-relative mb-3">
     <input
       type="text"
       id="buscador"
       class="form-control"
       placeholder="Buscar receta..."
     >
+    <div id="resultados" class="list-group position-absolute w-100 mt-1"></div>
   </div>
-
-  <div id="resultados"></div>
 {% endblock %}

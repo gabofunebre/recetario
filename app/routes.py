@@ -106,13 +106,19 @@ def crear_receta():
     if request.method == 'POST':
         nombre = request.form.get('nombre', '').strip()
         autor = request.form.get('autor', '').strip()
+        descripcion = request.form.get('descripcion', '').strip()
         metodo = request.form.get('metodo', '').strip()
         ingredientes_data = request.form.getlist('ingredientes[]')
         cantidades_data = request.form.getlist('cantidades[]')
         unidades_data = request.form.getlist('unidades[]')
         if not nombre or not autor or not metodo:
             return "Por favor, complete todos los campos", 400
-        receta = Receta(nombre=nombre, autor=autor, metodo=metodo)
+        receta = Receta(
+            nombre=nombre,
+            autor=autor,
+            descripcion=descripcion,
+            metodo=metodo
+        )
         db.session.add(receta)
         db.session.commit()
         for i in range(len(ingredientes_data)):

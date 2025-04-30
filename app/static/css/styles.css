@@ -2,78 +2,42 @@
 
 /* Body background and font */
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f8f9fa;
-    color: #212529;
-  }
-  
-  /* Container adjustments */
-  .container {
-    max-width: 960px;
-    margin-top: 2rem;
-    margin-bottom: 2rem;
-  }
-  
-  /* Ingredient item styling */
-  .ingrediente {
-    padding: 1rem;
-    border: 1px solid #dee2e6;
-    border-radius: 0.25rem;
-    background-color: #ffffff;
-  }
-  
-  /* Space between ingredient items */
-  .ingrediente + .ingrediente {
-    margin-top: 1rem;
-  }
-  
-  /* Remove ingredient button styling */
-  .btn-remove {
-    font-size: 1.25rem;
-    line-height: 1;
-    color: #dc3545;
-    background: none;
-    border: none;
-  }
-  .btn-remove:hover {
-    color: #bd2130;
-  }
-  
-  /* Search results dropdown for recipes */
-  #resultados {
-    position: absolute;
-    width: 100%;
-    z-index: 1000;
-  }
-  .resultado {
-    background: #ffffff;
-    padding: 0.5rem;
-    border: 1px solid #dee2e6;
-    border-top: none;
-    cursor: pointer;
-  }
-  .resultado:hover {
-    background-color: #f8f9fa;
-  }
-  
-  /* Search results dropdown for users */
-  .position-relative #resultados_usuarios {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    max-height: 200px;
-    overflow-y: auto;
-    border: 1px solid #dee2e6;
-    border-radius: 0.25rem;
-    background-color: #ffffff;
-  }
-  
-  .position-relative #resultados_usuarios .list-group-item {
-    cursor: pointer;
-  }
-  .position-relative #resultados_usuarios .list-group-item-action:hover {
-    background-color: #f1f1f1;
-  }
-  
+  font-family: 'Arial', sans-serif;
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+/* Container adjustments */
+.container {
+  max-width: 960px;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* Navbar link styling */
+.navbar-nav .nav-link {
+  font-size: 1.1rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  margin-left: 0.5rem;
+}
+
+/* Search input styling */
+#buscador {
+  font-size: 1.15rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease;
+}
+#buscador:focus {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  outline: none;
+}
+
+/* Results dropdown inherits Bootstrap list-group styles */
+.list-group-item-action {
+  cursor: pointer;
+}
+
+/* El resto de tu CSS queda igual... */

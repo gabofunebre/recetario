@@ -1,26 +1,36 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ carta.nombre if carta else 'Sin carta actual' }}{% endblock %}
+{% block title %}{{ carta.nombre }}{% endblock %}
 
 {% block content %}
   {% if carta %}
     <div class="mb-4">
       <h1>{{ carta.nombre }}</h1>
       <p class="text-muted">Autor: {{ carta.autor }}</p>
+      <p class="text-muted">Fecha: {{ carta.fecha.strftime('%d/%m/%Y') }}</p>
     </div>
 
-    <h3>Platos:</h3>
-    <ul class="list-group mb-3">
-      {% for plato in platos %}
-        <li class="list-group-item">
-          <strong>{{ plato.nombre }}</strong> - <span class="text-muted">{{ plato.autor }}</span><br>
-          <small>Ingredientes: {{ plato.ingredientes }}</small>
-        </li>
-      {% endfor %}
-    </ul>
+    {% for seccion in secciones %}
+      <div class="mb-3">
+        <h4>{{ seccion.nombre }}</h4>
+        {% if seccion.platos %}
+          <ul class="list-group">
+            {% for plato in seccion.platos %}
+              <li class="list-group-item">
+                <strong>{{ plato.nombre }}</strong>
+                {% if plato.descripcion %}- {{ plato.descripcion }}{% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted">No hay platos en esta sección.</p>
+        {% endif %}
+      </div>
+    {% endfor %}
+
   {% else %}
     <div class="alert alert-warning" role="alert">
-      No hay una carta actual disponible.
+      No hay una carta seleccionada.
     </div>
   {% endif %}
 
