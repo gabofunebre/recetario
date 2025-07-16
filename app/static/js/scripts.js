@@ -45,5 +45,32 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ... resto de tu JS (autores, ingredientes, carta) ...
+  // ------------------- INGREDIENTES DINÁMICOS -------------------
+  const contIngredientes = document.getElementById('ingredientes-container');
+  const btnAgregar = document.getElementById('btn-agregar');
+  if (contIngredientes && btnAgregar) {
+    const addHandlers = (elem) => {
+      const btnRemove = elem.querySelector('.btn-remove');
+      if (btnRemove) {
+        btnRemove.addEventListener('click', () => {
+          elem.remove();
+        });
+      }
+    };
+
+    // inicializar handlers para la primera línea
+    contIngredientes.querySelectorAll('.ingrediente').forEach(addHandlers);
+
+    btnAgregar.addEventListener('click', () => {
+      const base = contIngredientes.querySelector('.ingrediente');
+      if (!base) return;
+      const clone = base.cloneNode(true);
+      clone.querySelectorAll('input').forEach(i => i.value = '');
+      clone.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+      addHandlers(clone);
+      contIngredientes.appendChild(clone);
+    });
+  }
+
+  // ---------------------------------------------------------------
 });
