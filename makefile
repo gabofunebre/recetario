@@ -29,6 +29,10 @@ seed:
 restart:
 	make down
 	make up
+
+restart-seed:
+	make down
+	make up
 	make seed
 
 ps:
