@@ -21,10 +21,6 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <a class="nav-link {% if request.endpoint == 'main.cartas' %}active{% endif %}"
-               href="{{ url_for('main.cartas') }}">Cartas</a>
-          </li>
-          <li class="nav-item">
             <a class="nav-link {% if request.endpoint == 'main.crear_receta' %}active{% endif %}"
                href="{{ url_for('main.crear_receta') }}">Nueva Receta</a>
           </li>

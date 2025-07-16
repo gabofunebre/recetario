@@ -1,7 +1,7 @@
 
 # Recetario App
 
-Una aplicación de recetas donde los usuarios pueden consultar, agregar, editar y eliminar recetas. Además, es posible gestionar diferentes cartas de menús.
+Una aplicación de recetas donde los usuarios pueden consultar, agregar, editar y eliminar recetas.
 
 ## Estructura de directorios
 
@@ -51,6 +51,18 @@ Abre tu navegador y ve a `http://localhost:1881` para acceder a la aplicación e
 ```bash
 make migrate
 ```
+
+### 4. Persistencia y respaldo de la base de datos
+La base de datos se guarda de forma persistente fuera del contenedor. El archivo
+`recetario.db` se monta en el contenedor desde:
+
+```
+/WDPassportGabo/Servicios/Recetario/base_de_datos/recetario.db
+```
+
+Para realizar un *backup* simplemente copia ese archivo a la ubicación de tu
+preferencia. Asimismo, la carpeta de configuración local se mantiene en
+`/WDPassportGabo/Servicios/Recetario/instance`.
 
 ## Comandos útiles en el Makefile
 

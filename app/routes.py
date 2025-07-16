@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for, Blueprint, jsonify, flash
 from . import db
-from .models import Usuario, Carta, Seccion, Plato, Receta, Ingrediente
+from .models import Usuario, Receta, Ingrediente
 import json
 
 main = Blueprint('main', __name__)
@@ -15,18 +15,15 @@ def _serialize_receta(receta):
         "id": receta.id,
         "nombre": receta.nombre,
         "descripcion": receta.descripcion,
-        "plato": {"id": receta.plato.id, "nombre": receta.plato.nombre} if receta.plato else None,
         "ingredientes": [{"id": ing.id, "nombre": ing.nombre} for ing in receta.ingredientes]
     }
 
 @main.route('/buscar_recetas')
 def buscar_recetas():
     recetas = Receta.query.all()
-    platos = Plato.query.all()
     ingredientes = Ingrediente.query.all()
     return jsonify({
         "recetas": [_serialize_receta(r) for r in recetas],
-        "platos": [{"id": p.id, "nombre": p.nombre} for p in platos],
         "ingredientes": [{"id": i.id, "nombre": i.nombre} for i in ingredientes]
     })
 
@@ -40,66 +37,6 @@ def api_autores():
             nombres.append(name)
     return jsonify([{"nombre": n} for n in nombres])
 
-@main.route('/cartas')
-def cartas():
-    cartas = Carta.query.order_by(Carta.id.desc()).all()
-    return render_template('cartas.html', cartas=cartas)
-
-@main.route('/carta/<int:id>')
-def carta(id):
-    carta = Carta.query.get_or_404(id)
-    secciones = Seccion.query.filter_by(carta_id=carta.id).all()
-    return render_template('carta_actual.html', carta=carta, secciones=secciones)
-
-@main.route('/carta_actual')
-def carta_actual():
-    carta = Carta.query.order_by(Carta.id.desc()).first()
-    secciones = Seccion.query.filter_by(carta_id=carta.id).all() if carta else []
-    return render_template('carta_actual.html', carta=carta, secciones=secciones)
-
-@main.route('/crear_carta', methods=['GET', 'POST'])
-def crear_carta():
-    if request.method == 'POST':
-        payload = request.form.get('payload')
-        if not payload:
-            flash('Datos inválidos para crear la carta', 'danger')
-            return redirect(url_for('main.crear_carta'))
-        data = json.loads(payload)
-        # 1) Crear la carta (sin autor por ahora)
-        carta = Carta(nombre=data.get('nombreCarta'), autor=None)
-        db.session.add(carta)
-        db.session.flush()
-        # 2) Crear secciones y platos
-        for sec in data.get('secciones', []):
-            seccion = Seccion(nombre=sec.get('nombre'), carta_id=carta.id)
-            db.session.add(seccion)
-            db.session.flush()
-            for p in sec.get('platos', []):
-                plato = Plato(
-                    nombre=p.get('nombre'),
-                    descripcion=p.get('descripcion'),
-                    seccion_id=seccion.id
-                )
-                db.session.add(plato)
-        db.session.commit()
-        flash('Carta creada correctamente.', 'success')
-        return redirect(url_for('main.cartas'))
-    return render_template('crear_carta.html')
-
-@main.route('/crear_plato/<int:carta_id>', methods=['GET', 'POST'])
-def crear_plato(carta_id):
-    carta = Carta.query.get_or_404(carta_id)
-    if request.method == 'POST':
-        nombre = request.form.get('nombre', '').strip()
-        descripcion = request.form.get('descripcion', '').strip()
-        if not nombre:
-            return "Por favor, complete todos los campos", 400
-        # Ahora Plato requiere seccion_id, lanzar error o escoger primera sección
-        plato = Plato(nombre=nombre, descripcion=descripcion, seccion_id=None)
-        db.session.add(plato)
-        db.session.commit()
-        return redirect(url_for('main.cartas'))
-    return render_template('crear_plato.html', carta=carta)
 
 @main.route('/crear_receta', methods=['GET', 'POST'])
 def crear_receta():

@@ -7,7 +7,14 @@ services:
       - "1881:5000"
     volumes:
       - .:/app
-      - /WDPassportGabo/recetario_app/instance:/app/instance
+      - /WDPassportGabo/Servicios/Recetario/instance:/app/instance
+      - /WDPassportGabo/Servicios/Recetario/base_de_datos/recetario.db:/app/recetario.db
     environment:
       - FLASK_APP=run.py
     restart: always
+    networks:
+      - nginx_net
+
+networks:
+  nginx_net:
+    external: true
