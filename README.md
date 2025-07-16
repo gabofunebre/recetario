@@ -67,7 +67,7 @@ preferencia. Asimismo, la carpeta de configuración local se mantiene en
 ## Comandos útiles en el Makefile
 
 - **make up**: Construye y levanta los contenedores en segundo plano.
-- **make down**: Detiene y elimina los contenedores y volúmenes.
+- **make down**: Detiene los contenedores.
 - **make restart**: Reinicia la aplicación (detiene y vuelve a levantar los contenedores).
 - **make logs**: Muestra los logs del contenedor.
 - **make shell**: Abre una terminal dentro del contenedor.
