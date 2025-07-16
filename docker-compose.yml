@@ -6,9 +6,9 @@ services:
     ports:
       - "1881:5000"
     volumes:
-      - .:/app
-      - /WDPassportGabo/Servicios/Recetario/instance:/app/instance
-      - /WDPassportGabo/Servicios/Recetario/base_de_datos/recetario.db:/app/recetario.db
+      - /srv/dev-disk-by-uuid-1735d6ab-2a75-4dc4-91a9-b81bb3fda73d/Servicios/Recetario/recetario:/app
+      - /srv/dev-disk-by-uuid-1735d6ab-2a75-4dc4-91a9-b81bb3fda73d/Servicios/Recetario/recetario/instance:/app/instance
+      - /srv/dev-disk-by-uuid-1735d6ab-2a75-4dc4-91a9-b81bb3fda73d/Servicios/Recetario/base_de_datos/recetario.db:/app/recetario.db
     environment:
       - FLASK_APP=run.py
     restart: always
