@@ -1,7 +1,7 @@
 
 # Recetario App
 
-Una aplicación de recetas donde los usuarios pueden consultar, agregar, editar y eliminar recetas. Además, es posible gestionar diferentes cartas de menús.
+Una aplicación de recetas donde los usuarios pueden consultar, agregar, editar y eliminar recetas.
 
 ## Estructura de directorios
 
