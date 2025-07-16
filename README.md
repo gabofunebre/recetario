@@ -5,7 +5,7 @@ Una aplicación de recetas donde los usuarios pueden consultar, agregar, editar 
 
 ## Estructura de directorios
 
-/WDPassportGabo/app_recetario/
+/srv/dev-disk-by-uuid-1735d6ab-2a75-4dc4-91a9-b81bb3fda73d/Servicios/Recetario/recetario/
 ├── /app/                 # Lógica de la aplicación Flask
 ├── /instance/            # Configuraciones locales
 ├── /__pycache__/          # Archivos compilados de Python
@@ -57,12 +57,12 @@ La base de datos se guarda de forma persistente fuera del contenedor. El archivo
 `recetario.db` se monta en el contenedor desde:
 
 ```
-/WDPassportGabo/Servicios/Recetario/base_de_datos/recetario.db
+/srv/dev-disk-by-uuid-1735d6ab-2a75-4dc4-91a9-b81bb3fda73d/Servicios/Recetario/base_de_datos/recetario.db
 ```
 
 Para realizar un *backup* simplemente copia ese archivo a la ubicación de tu
 preferencia. Asimismo, la carpeta de configuración local se mantiene en
-`/WDPassportGabo/Servicios/Recetario/instance`.
+`/srv/dev-disk-by-uuid-1735d6ab-2a75-4dc4-91a9-b81bb3fda73d/Servicios/Recetario/recetario/instance`.
 
 ## Comandos útiles en el Makefile
 
