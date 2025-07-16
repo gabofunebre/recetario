@@ -1,5 +1,3 @@
-# Makefile para app_recetario
-
 CONTAINER=app_recetario-recetario-1
 
 # Comando para correr algo dentro del contenedor
@@ -11,7 +9,7 @@ up:
 	docker compose up --build -d
 
 down:
-        docker compose down
+	docker compose down
 
 logs:
 	docker compose logs -f
