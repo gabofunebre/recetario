@@ -24,6 +24,10 @@
             <a class="nav-link {% if request.endpoint == 'main.crear_receta' %}active{% endif %}"
                href="{{ url_for('main.crear_receta') }}">Nueva Receta</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint == 'main.ver_recetas' %}active{% endif %}"
+               href="{{ url_for('main.ver_recetas') }}">Todas las recetas</a>
+          </li>
         </ul>
       </div>
     </div>
