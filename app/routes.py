@@ -17,6 +17,14 @@ def images(filename):
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
+def _get_uploaded_images():
+    """Return list of uploaded image files regardless of input name."""
+    archivos = request.files.getlist('imagenes')
+    if not archivos:
+        archivos = request.files.getlist('imagenes[]')
+    return archivos
+
 @main.route('/')
 def index():
     return render_template('index.html')
@@ -81,9 +89,7 @@ def crear_receta():
         db.session.commit()
 
         # Guardar imágenes si se subieron
-        archivos = request.files.getlist('imagenes')
-        if not archivos:
-            archivos = request.files.getlist('imagenes[]')
+        archivos = _get_uploaded_images()
         if archivos:
             carpeta = os.path.join(current_app.config['IMAGE_UPLOADS'], str(receta.id))
             os.makedirs(carpeta, exist_ok=True)
@@ -151,9 +157,7 @@ def editar_receta(id):
             if os.path.isfile(path):
                 os.remove(path)
         # Guardar nuevas imágenes
-        archivos = request.files.getlist('imagenes')
-        if not archivos:
-            archivos = request.files.getlist('imagenes[]')
+        archivos = _get_uploaded_images()
         if archivos:
             os.makedirs(carpeta, exist_ok=True)
             for f in archivos:
