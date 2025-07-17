@@ -59,6 +59,7 @@
     {% if imagenes %}
     <div class="mb-4">
       <label class="form-label">Imágenes actuales</label>
+
       <div class="d-flex flex-wrap gap-2">
         {% for img in imagenes %}
         <label class="form-check-label position-relative">
@@ -68,6 +69,7 @@
         {% endfor %}
       </div>
       <small class="text-muted">Marca las imágenes que deseas eliminar</small>
+
     </div>
     {% endif %}
 
@@ -83,6 +85,7 @@
 
     <div class="d-grid mb-4">
       <button type="submit" class="btn btn-success btn-lg">Editar Receta</button>
+
     </div>
   </form>
 

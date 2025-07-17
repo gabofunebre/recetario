@@ -155,4 +155,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ------------------- ELIMINAR IMÁGENES EXISTENTES -------------
+  const contActuales = document.getElementById('imagenes-actuales');
+  const formReceta = document.getElementById('form-receta');
+  if (contActuales && formReceta) {
+    contActuales.querySelectorAll('.eliminar-imagen').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const cont = btn.parentElement;
+        if (cont) cont.remove();
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'eliminar_imagenes';
+        input.value = btn.dataset.img;
+        formReceta.appendChild(input);
+      });
+    });
+  }
+
 });
