@@ -12,7 +12,7 @@ services:
     environment:
       - FLASK_APP=app/run.py
       - FLASK_ENV=development
-      - DATABASE_URL=postgresql://recetario:recetario@db:5432/recetario
+      - DATABASE_URL=postgresql://recetario:recetario@db:5433/recetario
     depends_on:
       - db
     restart: always
@@ -21,6 +21,9 @@ services:
 
   db:
     image: postgres:15-alpine
+    command: -p 5433
+    ports:
+      - "5433:5433"
     environment:
       POSTGRES_DB: recetario
       POSTGRES_USER: recetario
