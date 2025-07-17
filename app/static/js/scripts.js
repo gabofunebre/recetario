@@ -104,18 +104,39 @@ document.addEventListener('DOMContentLoaded', () => {
       inputImagenes.files = dt.files;
     }
   };
+  const renderPreviews = () => {
+    if (!preview) return;
+    preview.innerHTML = '';
+    archivosSeleccionados.forEach((file, idx) => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'preview-container';
+      const img = document.createElement('img');
+      img.className = 'img-thumbnail preview-thumb';
+      const url = URL.createObjectURL(file);
+      img.src = url;
+      img.onload = () => URL.revokeObjectURL(url);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'preview-remove';
+      btn.innerHTML = '&times;';
+      btn.addEventListener('click', () => {
+        archivosSeleccionados.splice(idx, 1);
+        renderPreviews();
+        actualizarInput();
+      });
+      wrapper.appendChild(img);
+      wrapper.appendChild(btn);
+      preview.appendChild(wrapper);
+    });
+  };
 
   const agregarArchivos = (files) => {
     Array.from(files).forEach(file => {
       if (!file.type.startsWith('image/')) return;
       archivosSeleccionados.push(file);
-      if (preview) {
-        const img = document.createElement('img');
-        img.className = 'img-thumbnail preview-thumb';
-        img.src = URL.createObjectURL(file);
-        preview.appendChild(img);
-      }
     });
+    renderPreviews();
+
     actualizarInput();
   };
 

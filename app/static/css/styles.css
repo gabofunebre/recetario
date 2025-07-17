@@ -55,4 +55,28 @@ body {
   object-fit: cover;
 }
 
+.preview-container {
+  position: relative;
+  display: inline-block;
+}
+
+.preview-remove {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1.2rem;
+  height: 1.2rem;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.75rem;
+  line-height: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
 /* El resto de tu CSS queda igual... */
