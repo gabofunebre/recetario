@@ -25,6 +25,12 @@ def create_app():
 
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+    # Carpeta para subir imágenes
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    image_dir = os.path.join(base_dir, 'data', 'images')
+    os.makedirs(image_dir, exist_ok=True)
+    app.config['IMAGE_UPLOADS'] = image_dir
+
     # Habilitar modo de desarrollo y depuración
     app.config['FLASK_ENV'] = 'development'  # Configura el entorno como desarrollo
     app.config['DEBUG'] = True  # Habilita la depuración
