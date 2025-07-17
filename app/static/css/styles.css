@@ -40,4 +40,12 @@ body {
   cursor: pointer;
 }
 
+/* Galería de imágenes */
+.galeria-thumb {
+  width: 1in;
+  height: 1in;
+  object-fit: cover;
+  cursor: pointer;
+}
+
 /* El resto de tu CSS queda igual... */

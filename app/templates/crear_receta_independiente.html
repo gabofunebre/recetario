@@ -5,7 +5,7 @@
 {% block content %}
   <h1 class="mb-4">Nueva Receta</h1>
 
-  <form method="POST" id="form-receta" data-api-autores="{{ url_for('main.api_autores') }}">
+  <form method="POST" enctype="multipart/form-data" id="form-receta" data-api-autores="{{ url_for('main.api_autores') }}">
     <div class="row g-3 mb-4">
       <div class="col-md-8">
         <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Nombre de la Receta" required>
@@ -50,8 +50,14 @@
       <button type="button" class="btn btn-secondary" id="btn-agregar">Agregar Ingrediente</button>
     </div>
 
+
     <div class="mb-4">
       <textarea id="metodo" name="metodo" class="form-control" rows="5" placeholder="Método de Preparación" required></textarea>
+    </div>
+
+    <div class="mb-4">
+      <label for="imagenes" class="form-label">Imágenes del proceso</label>
+      <input type="file" id="imagenes" name="imagenes" class="form-control" accept="image/*" multiple>
     </div>
 
     <div class="d-grid mb-4">
