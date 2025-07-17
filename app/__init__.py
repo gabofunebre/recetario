@@ -27,7 +27,7 @@ def create_app():
 
     # Carpeta para subir imágenes
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    image_dir = os.path.join(base_dir, 'images')
+    image_dir = os.path.join(base_dir, 'data', 'images')
     os.makedirs(image_dir, exist_ok=True)
     app.config['IMAGE_UPLOADS'] = image_dir
 
