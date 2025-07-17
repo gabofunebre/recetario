@@ -6,14 +6,12 @@ Una aplicación de recetas donde los usuarios pueden consultar, agregar, editar 
 ## Estructura de directorios
 
 /srv/dev-disk-by-uuid-1735d6ab-2a75-4dc4-91a9-b81bb3fda73d/Servicios/Recetario/recetario/
-├── /app/                 # Lógica de la aplicación Flask
+├── /app/                 # Lógica de la aplicación Flask (incluye `run.py` y `seed.py`)
 ├── /instance/            # Configuraciones locales
 ├── /__pycache__/          # Archivos compilados de Python
 ├── Dockerfile             # Instrucciones para crear la imagen Docker
 ├── docker-compose.yml     # Composición de los contenedores Docker
 ├── requirements.txt       # Dependencias del proyecto
-├── run.py                 # Punto de entrada de la aplicación
-├── seed.py                # Script para cargar datos iniciales
 └── Makefile               # Script para facilitar la gestión del contenedor
 
 ## Requisitos

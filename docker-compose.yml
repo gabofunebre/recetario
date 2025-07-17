@@ -7,11 +7,10 @@ services:
       - "1881:5000"
     volumes:
       - ./app:/app
-      - ./run.py:/app/run.py
       - ./instance:/app/instance
       - ./data/recetario.db:/app/recetario.db
     environment:
-      - FLASK_APP=run.py
+      - FLASK_APP=app/run.py
       - FLASK_ENV=development
     restart: always
     networks:
