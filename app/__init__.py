@@ -18,6 +18,7 @@ def create_app():
         'postgresql://recetario:recetario@db:5432/recetario'
     )
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     # Habilitar modo de desarrollo y depuración
