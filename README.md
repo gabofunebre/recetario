@@ -3,12 +3,16 @@
 
 Una aplicación de recetas donde los usuarios pueden consultar, agregar, editar y eliminar recetas.
 
+La versión actual de la aplicación utiliza **PostgreSQL** como base de datos en lugar de SQLite. Todo se ejecuta dentro de contenedores Docker para facilitar la configuración y la persistencia de los datos.
+
 ## Estructura de directorios
 
 /srv/dev-disk-by-uuid-1735d6ab-2a75-4dc4-91a9-b81bb3fda73d/Servicios/Recetario/recetario/
 ├── /app/                 # Lógica de la aplicación Flask (incluye `run.py` y `seed.py`)
 ├── /instance/            # Configuraciones locales
-├── /baseDatos/           # Base de datos SQLite persistente
+├── /data/
+│   ├── /db/              # Datos persistentes de PostgreSQL
+│   └── /images/          # Carpeta para imágenes
 ├── /__pycache__/          # Archivos compilados de Python
 ├── Dockerfile             # Instrucciones para crear la imagen Docker
 ├── docker-compose.yml     # Composición de los contenedores Docker
@@ -54,18 +58,16 @@ make migrate
 ```
 
 ### 4. Persistencia y respaldo de la base de datos
-La base de datos se guarda de forma persistente fuera del contenedor. El archivo
-`recetario.db` se monta desde la carpeta `baseDatos` del proyecto mediante el
-`docker-compose.yml`:
+La aplicación utiliza PostgreSQL como base de datos, la cual se ejecuta en un
+contenedor separado. Los datos se almacenan en la carpeta `data/db/` de este
+proyecto, que se monta dentro del contenedor de PostgreSQL.
 
-```
-./baseDatos:/app/baseDatos
-```
+Para realizar un *backup* basta con copiar el contenido de `data/db/` o emplear
+las herramientas de respaldo de PostgreSQL según tus necesidades. La carpeta de
+configuración local sigue estando en `instance/`.
 
-Antes de levantar los contenedores asegúrate de crear la carpeta `baseDatos/` (el
-archivo será generado automáticamente). Para realizar un *backup* simplemente
-copia `baseDatos/recetario.db` a la ubicación de tu preferencia. La carpeta de
-configuración local se mantiene en `instance/`.
+Adicionalmente, las imágenes que suba la aplicación se almacenarán en
+`data/images/`, por lo que también puedes respaldar esa carpeta si la utilizas.
 
 ## Comandos útiles en el Makefile
 
