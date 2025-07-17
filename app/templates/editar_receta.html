@@ -59,15 +59,15 @@
     {% if imagenes %}
     <div class="mb-4">
       <label class="form-label">Imágenes actuales</label>
-      <div class="d-flex flex-wrap gap-2">
+      <div class="d-flex flex-wrap gap-2" id="imagenes-actuales">
         {% for img in imagenes %}
-        <label class="form-check-label position-relative">
-          <img src="{{ url_for('main.images', filename=img) }}" class="img-thumbnail preview-thumb">
-          <input class="form-check-input position-absolute top-0 start-0" type="checkbox" name="eliminar_imagenes" value="{{ img }}" style="transform: scale(1.3);">
-        </label>
+        <div class="preview-container">
+          <img src="{{ url_for('main.images', filename=img) }}" class="img-thumbnail preview-thumb" alt="Imagen {{ loop.index }}">
+          <button type="button" class="preview-remove eliminar-imagen" data-img="{{ img }}">&times;</button>
+        </div>
         {% endfor %}
       </div>
-      <small class="text-muted">Marca las imágenes que deseas eliminar</small>
+      <small class="text-muted">Haz clic en la cruz para eliminar una imagen</small>
     </div>
     {% endif %}
 
@@ -81,8 +81,9 @@
       <div id="preview" class="d-flex flex-wrap gap-2 mt-2"></div>
     </div>
 
-    <div class="d-grid mb-4">
+    <div class="d-grid gap-2 mb-4">
       <button type="submit" class="btn btn-success btn-lg">Editar Receta</button>
+      <a href="{{ url_for('main.mostrar_receta', id=receta.id) }}" class="btn btn-outline-secondary btn-lg">Cancelar</a>
     </div>
   </form>
 
