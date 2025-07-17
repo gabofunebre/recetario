@@ -6,12 +6,11 @@ services:
     ports:
       - "1881:5000"
     volumes:
-      - /srv/dev-disk-by-uuid-1735d6ab-2a75-4dc4-91a9-b81bb3fda73d/Servicios/Recetario/recetario/app:/app
-      - /srv/dev-disk-by-uuid-1735d6ab-2a75-4dc4-91a9-b81bb3fda73d/Servicios/Recetario/recetario/run.py:/app/run.py
-      - /srv/dev-disk-by-uuid-1735d6ab-2a75-4dc4-91a9-b81bb3fda73d/Servicios/Recetario/recetario/instance:/app/instance
-      - /srv/dev-disk-by-uuid-1735d6ab-2a75-4dc4-91a9-b81bb3fda73d/Servicios/Recetario/base_de_datos/recetario.db:/app/recetario.db
+      - ./app:/app
+      - ./instance:/app/instance
+      - ./data/recetario.db:/app/recetario.db
     environment:
-      - FLASK_APP=run.py
+      - FLASK_APP=app/run.py
       - FLASK_ENV=development
     restart: always
     networks:
