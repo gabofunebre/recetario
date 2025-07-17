@@ -6,7 +6,7 @@ services:
     ports:
       - "1881:5000"
     volumes:
-      - ./app:/app
+      - ./:/app
       - ./instance:/app/instance
       - ../baseDatos:/app/baseDatos  # <--- cambio clave: persistencia fuera del contenedor
     environment:
