@@ -24,7 +24,7 @@ test:
 	make run pytest
 
 seed:
-	make run python seed.py
+        make run python app/seed.py
 
 restart:
 	make down

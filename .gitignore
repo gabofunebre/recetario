@@ -35,6 +35,8 @@ docker-compose.override.yml
 
 # Base de datos y volúmenes
 data/
+baseDatos/
+!baseDatos/.gitkeep
 db/
 volumes/
 instance/

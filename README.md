@@ -8,6 +8,7 @@ Una aplicación de recetas donde los usuarios pueden consultar, agregar, editar 
 /srv/dev-disk-by-uuid-1735d6ab-2a75-4dc4-91a9-b81bb3fda73d/Servicios/Recetario/recetario/
 ├── /app/                 # Lógica de la aplicación Flask (incluye `run.py` y `seed.py`)
 ├── /instance/            # Configuraciones locales
+├── /baseDatos/           # Base de datos SQLite persistente
 ├── /__pycache__/          # Archivos compilados de Python
 ├── Dockerfile             # Instrucciones para crear la imagen Docker
 ├── docker-compose.yml     # Composición de los contenedores Docker
@@ -45,6 +46,8 @@ make up
 ### 2. Acceder a la aplicación
 Abre tu navegador y ve a `http://localhost:1881` para acceder a la aplicación en tu contenedor Docker.
 
+Los archivos `.py` y las plantillas HTML se montan en el contenedor y Flask se ejecuta en modo desarrollo (`FLASK_ENV=development`). Cualquier cambio en esos archivos se refleja de inmediato sin reiniciar el contenedor.
+
 ### 3. Realizar migraciones de base de datos (si es necesario)
 ```bash
 make migrate
@@ -52,16 +55,16 @@ make migrate
 
 ### 4. Persistencia y respaldo de la base de datos
 La base de datos se guarda de forma persistente fuera del contenedor. El archivo
-`recetario.db` se monta desde la carpeta `data` del proyecto mediante el
+`recetario.db` se monta desde la carpeta `baseDatos` del proyecto mediante el
 `docker-compose.yml`:
 
 ```
-./data/recetario.db:/app/recetario.db
+./baseDatos:/app/baseDatos
 ```
 
-Antes de levantar los contenedores asegúrate de crear la carpeta `data/` (el
+Antes de levantar los contenedores asegúrate de crear la carpeta `baseDatos/` (el
 archivo será generado automáticamente). Para realizar un *backup* simplemente
-copia `data/recetario.db` a la ubicación de tu preferencia. La carpeta de
+copia `baseDatos/recetario.db` a la ubicación de tu preferencia. La carpeta de
 configuración local se mantiene en `instance/`.
 
 ## Comandos útiles en el Makefile
