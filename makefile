@@ -12,7 +12,7 @@ down:
 	docker compose down
 
 logs:
-	docker compose logs -f
+	docker compose logs -f || true
 
 shell:
 	docker exec -it $(CONTAINER) /bin/bash
