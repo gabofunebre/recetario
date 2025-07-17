@@ -5,6 +5,9 @@ from flask_sqlalchemy import SQLAlchemy
 # Instancia global de SQLAlchemy (la usás en models.py)
 db = SQLAlchemy()
 
+# Track if the tables were successfully created
+_tables_created = False
+
 def create_app():
     app = Flask(__name__)
 
@@ -38,17 +41,25 @@ def create_app():
         # Crear las tablas si aún no existen
         try:
             db.create_all()
+            global _tables_created
+            _tables_created = True
         except Exception as e:
             app.logger.error(f"Error al crear las tablas: {e}")
 
-    @app.before_first_request
-    def initialize_database():
-        """Garantiza que las tablas existan cuando llegue la primera petición."""
+    def _ensure_tables_exist():
+        """Intenta crear las tablas si aún no fueron creadas."""
+        global _tables_created
+        if _tables_created:
+            return
         try:
             db.create_all()
+            _tables_created = True
         except Exception as e:
-            app.logger.error(
-                f"Error al crear las tablas en before_first_request: {e}"
-            )
+            app.logger.error(f"Error al crear las tablas: {e}")
+
+    # Intentar de nuevo en cada request hasta que la DB esté lista
+    @app.before_request
+    def check_tables():
+        _ensure_tables_exist()
 
     return app
