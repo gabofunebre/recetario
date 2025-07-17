@@ -41,4 +41,14 @@ def create_app():
         except Exception as e:
             app.logger.error(f"Error al crear las tablas: {e}")
 
+    @app.before_first_request
+    def initialize_database():
+        """Garantiza que las tablas existan cuando llegue la primera petición."""
+        try:
+            db.create_all()
+        except Exception as e:
+            app.logger.error(
+                f"Error al crear las tablas en before_first_request: {e}"
+            )
+
     return app
