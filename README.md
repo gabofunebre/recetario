@@ -3,12 +3,14 @@
 
 Una aplicación de recetas donde los usuarios pueden consultar, agregar, editar y eliminar recetas.
 
+La versión actual de la aplicación utiliza **PostgreSQL** como base de datos en lugar de SQLite. Todo se ejecuta dentro de contenedores Docker para facilitar la configuración y la persistencia de los datos.
+
 ## Estructura de directorios
 
 /srv/dev-disk-by-uuid-1735d6ab-2a75-4dc4-91a9-b81bb3fda73d/Servicios/Recetario/recetario/
 ├── /app/                 # Lógica de la aplicación Flask (incluye `run.py` y `seed.py`)
 ├── /instance/            # Configuraciones locales
-├── /baseDatos/           # Base de datos SQLite persistente
+├── /baseDatos/           # (obsoleto) carpeta que antes alojaba SQLite
 ├── /__pycache__/          # Archivos compilados de Python
 ├── Dockerfile             # Instrucciones para crear la imagen Docker
 ├── docker-compose.yml     # Composición de los contenedores Docker
@@ -54,18 +56,14 @@ make migrate
 ```
 
 ### 4. Persistencia y respaldo de la base de datos
-La base de datos se guarda de forma persistente fuera del contenedor. El archivo
-`recetario.db` se monta desde la carpeta `baseDatos` del proyecto mediante el
-`docker-compose.yml`:
+La aplicación utiliza PostgreSQL como base de datos, la cual se ejecuta en un
+contenedor separado. Sus datos se almacenan en el volumen `postgres_data`, lo que
+garantiza que la información persista entre reinicios o recreaciones de los
+contenedores.
 
-```
-./baseDatos:/app/baseDatos
-```
-
-Antes de levantar los contenedores asegúrate de crear la carpeta `baseDatos/` (el
-archivo será generado automáticamente). Para realizar un *backup* simplemente
-copia `baseDatos/recetario.db` a la ubicación de tu preferencia. La carpeta de
-configuración local se mantiene en `instance/`.
+Para realizar un *backup* de la base simplemente copia el contenido del volumen
+`postgres_data` o utiliza las herramientas de respaldo de PostgreSQL según tus
+necesidades. La carpeta de configuración local sigue estando en `instance/`.
 
 ## Comandos útiles en el Makefile
 
