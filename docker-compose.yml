@@ -8,7 +8,7 @@ services:
     volumes:
       - ./app:/app
       - ./instance:/app/instance
-      - ./data/recetario.db:/app/recetario.db
+      - ../baseDatos:/app/baseDatos  # <--- cambio clave: persistencia fuera del contenedor
     environment:
       - FLASK_APP=app/run.py
       - FLASK_ENV=development
