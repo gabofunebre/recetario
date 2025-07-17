@@ -10,7 +10,9 @@ La versión actual de la aplicación utiliza **PostgreSQL** como base de datos e
 /srv/dev-disk-by-uuid-1735d6ab-2a75-4dc4-91a9-b81bb3fda73d/Servicios/Recetario/recetario/
 ├── /app/                 # Lógica de la aplicación Flask (incluye `run.py` y `seed.py`)
 ├── /instance/            # Configuraciones locales
-├── /baseDatos/           # (obsoleto) carpeta que antes alojaba SQLite
+├── /data/
+│   ├── /db/              # Datos persistentes de PostgreSQL
+│   └── /images/          # Carpeta para imágenes
 ├── /__pycache__/          # Archivos compilados de Python
 ├── Dockerfile             # Instrucciones para crear la imagen Docker
 ├── docker-compose.yml     # Composición de los contenedores Docker
@@ -57,13 +59,15 @@ make migrate
 
 ### 4. Persistencia y respaldo de la base de datos
 La aplicación utiliza PostgreSQL como base de datos, la cual se ejecuta en un
-contenedor separado. Sus datos se almacenan en el volumen `postgres_data`, lo que
-garantiza que la información persista entre reinicios o recreaciones de los
-contenedores.
+contenedor separado. Los datos se almacenan en la carpeta `data/db/` de este
+proyecto, que se monta dentro del contenedor de PostgreSQL.
 
-Para realizar un *backup* de la base simplemente copia el contenido del volumen
-`postgres_data` o utiliza las herramientas de respaldo de PostgreSQL según tus
-necesidades. La carpeta de configuración local sigue estando en `instance/`.
+Para realizar un *backup* basta con copiar el contenido de `data/db/` o emplear
+las herramientas de respaldo de PostgreSQL según tus necesidades. La carpeta de
+configuración local sigue estando en `instance/`.
+
+Adicionalmente, las imágenes que suba la aplicación se almacenarán en
+`data/images/`, por lo que también puedes respaldar esa carpeta si la utilizas.
 
 ## Comandos útiles en el Makefile
 

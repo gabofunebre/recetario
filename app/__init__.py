@@ -12,9 +12,12 @@ def create_app():
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev_secret_key')
 
     # Configuración de la URI de la base de datos
-    # Se toma de la variable de entorno DATABASE_URL y se usa SQLite como
-    # valor por defecto para entornos locales o de desarrollo.
-    database_url = os.getenv('DATABASE_URL', 'sqlite:///baseDatos/recetario.db')
+
+    # Por defecto se conecta al contenedor "db" definido en docker-compose.
+    database_url = os.getenv(
+        'DATABASE_URL',
+        'postgresql://recetario:recetario@db:5432/recetario'
+    )
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
