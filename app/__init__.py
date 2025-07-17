@@ -19,7 +19,7 @@ def create_app():
     # Por defecto se conecta al contenedor "db" definido en docker-compose.
     database_url = os.getenv(
         'DATABASE_URL',
-        'postgresql://recetario:recetario@db:5432/recetario'
+        'postgresql://recetario:recetario@db:5433/recetario'
     )
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 
