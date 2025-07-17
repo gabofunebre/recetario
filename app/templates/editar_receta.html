@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Receta{% endblock %}
+
+{% block content %}
+  <h1 class="mb-4">Editar Receta</h1>
+
+  <form method="POST" enctype="multipart/form-data" id="form-receta" data-api-autores="{{ url_for('main.api_autores') }}">
+    <div class="row g-3 mb-4">
+      <div class="col-md-8">
+        <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Nombre de la Receta" required value="{{ receta.nombre }}">
+      </div>
+      <div class="col-md-4 position-relative">
+        <input type="text" id="autor" name="autor" class="form-control" placeholder="Autor" autocomplete="off" required value="{{ receta.autor }}">
+        <div id="resultados_autores" class="list-group position-absolute w-100 mt-1"></div>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <textarea id="descripcion" name="descripcion" class="form-control" rows="2" placeholder="Descripción breve">{{ receta.descripcion }}</textarea>
+    </div>
+
+    <div id="ingredientes-container" class="mb-4">
+      {% for ing in receta.ingredientes %}
+      <div class="row g-2 align-items-end mb-2 ingrediente">
+        <div class="col-md-5">
+          <input type="text" name="ingredientes[]" class="form-control" placeholder="Ingrediente" required value="{{ ing.nombre }}">
+        </div>
+        <div class="col-md-3">
+          <input type="number" name="cantidades[]" class="form-control" placeholder="Cantidad" required value="{{ ing.cantidad }}">
+        </div>
+        <div class="col-md-3">
+          <select name="unidades[]" class="form-select">
+            <option value="gramos" {% if ing.unidad == 'gramos' %}selected{% endif %}>Gramos</option>
+            <option value="kilogramos" {% if ing.unidad == 'kilogramos' %}selected{% endif %}>Kilogramos</option>
+            <option value="ml" {% if ing.unidad == 'ml' %}selected{% endif %}>Mililitros</option>
+            <option value="litros" {% if ing.unidad == 'litros' %}selected{% endif %}>Litros</option>
+            <option value="unidad" {% if ing.unidad == 'unidad' %}selected{% endif %}>Unidad</option>
+            <option value="puñado" {% if ing.unidad == 'puñado' %}selected{% endif %}>Puñado</option>
+            <option value="taza" {% if ing.unidad == 'taza' %}selected{% endif %}>Taza</option>
+            <option value="cucharada" {% if ing.unidad == 'cucharada' %}selected{% endif %}>Cucharada</option>
+            <option value="cucharadita" {% if ing.unidad == 'cucharadita' %}selected{% endif %}>Cucharadita</option>
+          </select>
+        </div>
+        <div class="col-md-1 text-end">
+          <button type="button" class="btn btn-outline-danger btn-remove" title="Eliminar ingrediente">&times;</button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="mb-4">
+      <button type="button" class="btn btn-secondary" id="btn-agregar">Agregar Ingrediente</button>
+    </div>
+
+    <div class="mb-4">
+      <textarea id="metodo" name="metodo" class="form-control" rows="5" placeholder="Método de Preparación" required>{{ receta.metodo }}</textarea>
+    </div>
+
+    {% if imagenes %}
+    <div class="mb-4">
+      <label class="form-label">Imágenes actuales</label>
+      <div class="d-flex flex-wrap gap-2">
+        {% for img in imagenes %}
+        <label class="form-check-label position-relative">
+          <img src="{{ url_for('main.images', filename=img) }}" class="img-thumbnail preview-thumb">
+          <input class="form-check-input position-absolute top-0 start-0" type="checkbox" name="eliminar_imagenes" value="{{ img }}" style="transform: scale(1.3);">
+        </label>
+        {% endfor %}
+      </div>
+      <small class="text-muted">Marca las imágenes que deseas eliminar</small>
+    </div>
+    {% endif %}
+
+    <div class="mb-4">
+      <label for="imagenes" class="form-label">Agregar imágenes</label>
+      <div class="input-group">
+        <input type="file" id="imagenes" name="imagenes" class="form-control" accept="image/*" multiple>
+        <button type="button" class="btn btn-outline-secondary" id="btn-capturar">Tomar foto</button>
+        <input type="file" id="capture-input" accept="image/*" capture="environment" style="display:none">
+      </div>
+      <div id="preview" class="d-flex flex-wrap gap-2 mt-2"></div>
+    </div>
+
+    <div class="d-grid mb-4">
+      <button type="submit" class="btn btn-success btn-lg">Editar Receta</button>
+    </div>
+  </form>
+
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+{% endblock %}
