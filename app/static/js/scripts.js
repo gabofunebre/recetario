@@ -72,5 +72,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ------------------- GALERÍA DE IMÁGENES --------------------
+  const thumbs = document.querySelectorAll('#galeria img');
+  const modalElem = document.getElementById('imagenModal');
+  const carouselElem = document.getElementById('galeriaCarousel');
+  if (thumbs.length && modalElem && carouselElem) {
+    const modal = new bootstrap.Modal(modalElem);
+    const carousel = new bootstrap.Carousel(carouselElem);
+    thumbs.forEach((img, idx) => {
+      img.addEventListener('click', () => {
+        carousel.to(idx);
+        modal.show();
+      });
+    });
+  }
+
   // ---------------------------------------------------------------
 });
