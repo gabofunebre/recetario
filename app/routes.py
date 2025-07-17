@@ -1,9 +1,21 @@
-from flask import render_template, request, redirect, url_for, Blueprint, jsonify, flash
+from flask import render_template, request, redirect, url_for, Blueprint, jsonify, flash, current_app, send_from_directory
+from werkzeug.utils import secure_filename
 from . import db
 from .models import Usuario, Receta, Ingrediente
 import json
 
+import os
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
 main = Blueprint('main', __name__)
+
+@main.route('/images/<path:filename>')
+def images(filename):
+    return send_from_directory(current_app.config['IMAGE_UPLOADS'], filename)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @main.route('/')
 def index():
@@ -67,13 +79,31 @@ def crear_receta():
             )
             db.session.add(ing)
         db.session.commit()
+
+        # Guardar imágenes si se subieron
+        archivos = request.files.getlist('imagenes')
+        if archivos:
+            carpeta = os.path.join(current_app.config['IMAGE_UPLOADS'], str(receta.id))
+            os.makedirs(carpeta, exist_ok=True)
+            for f in archivos:
+                if f and allowed_file(f.filename):
+                    nombre_seguro = secure_filename(f.filename)
+                    f.save(os.path.join(carpeta, nombre_seguro))
+
         return redirect(url_for('main.ver_recetas'))
     return render_template('crear_receta_independiente.html')
 
 @main.route('/receta/<int:id>')
 def mostrar_receta(id):
     receta = Receta.query.get_or_404(id)
-    return render_template('mostrar_receta.html', receta=receta)
+    carpeta = os.path.join(current_app.config['IMAGE_UPLOADS'], str(id))
+    imagenes = []
+    if os.path.isdir(carpeta):
+        for nombre in os.listdir(carpeta):
+            if allowed_file(nombre):
+                imagenes.append(f"{id}/{nombre}")
+    imagenes.sort()
+    return render_template('mostrar_receta.html', receta=receta, imagenes=imagenes)
 
 @main.route('/recetas')
 def ver_recetas():
