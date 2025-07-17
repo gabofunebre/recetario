@@ -96,7 +96,11 @@ def crear_receta():
             for f in archivos:
                 if f and allowed_file(f.filename):
                     nombre_seguro = secure_filename(f.filename)
-                    f.save(os.path.join(carpeta, nombre_seguro))
+                    try:
+                        f.save(os.path.join(carpeta, nombre_seguro))
+                    except OSError as err:
+                        current_app.logger.error(f"Error al guardar {nombre_seguro}: {err}")
+                        flash("Error al guardar imágenes")
 
         return redirect(url_for('main.ver_recetas'))
     return render_template('crear_receta_independiente.html')
@@ -163,7 +167,11 @@ def editar_receta(id):
             for f in archivos:
                 if f and allowed_file(f.filename):
                     nombre_seguro = secure_filename(f.filename)
-                    f.save(os.path.join(carpeta, nombre_seguro))
+                    try:
+                        f.save(os.path.join(carpeta, nombre_seguro))
+                    except OSError as err:
+                        current_app.logger.error(f"Error al guardar {nombre_seguro}: {err}")
+                        flash("Error al guardar imágenes")
         db.session.commit()
         return redirect(url_for('main.ver_recetas'))
 
