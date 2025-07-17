@@ -58,15 +58,16 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
 
-    // inicializar handlers para la primera línea
+    // inicializar handlers para la(s) línea(s) existente(s)
     contIngredientes.querySelectorAll('.ingrediente').forEach(addHandlers);
 
+    // guardar una plantilla limpia para futuros ingredientes
+    const template = contIngredientes.querySelector('.ingrediente').cloneNode(true);
+    template.querySelectorAll('input').forEach(i => i.value = '');
+    template.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+
     btnAgregar.addEventListener('click', () => {
-      const base = contIngredientes.querySelector('.ingrediente');
-      if (!base) return;
-      const clone = base.cloneNode(true);
-      clone.querySelectorAll('input').forEach(i => i.value = '');
-      clone.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+      const clone = template.cloneNode(true);
       addHandlers(clone);
       contIngredientes.appendChild(clone);
     });
@@ -103,7 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
       inputImagenes.files = dt.files;
     }
   };
-
   const renderPreviews = () => {
     if (!preview) return;
     preview.innerHTML = '';
@@ -136,6 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
       archivosSeleccionados.push(file);
     });
     renderPreviews();
+
     actualizarInput();
   };
 
