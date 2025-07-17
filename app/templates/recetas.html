@@ -16,7 +16,13 @@
             {% if receta.descripcion %}
               <p class="card-text">{{ receta.descripcion }}</p>
             {% endif %}
-            <a href="{{ url_for('main.mostrar_receta', id=receta.id) }}" class="btn btn-primary">Ver Receta</a>
+            <div class="d-flex gap-1">
+              <a href="{{ url_for('main.mostrar_receta', id=receta.id) }}" class="btn btn-primary btn-sm flex-fill">Ver Receta</a>
+              <a href="{{ url_for('main.editar_receta', id=receta.id) }}" class="btn btn-success btn-sm flex-fill">Editar</a>
+              <form method="POST" action="{{ url_for('main.eliminar_receta', id=receta.id) }}" class="flex-fill" onsubmit="return confirm('¿Eliminar esta receta?');">
+                <button type="submit" class="btn btn-danger btn-sm w-100">Eliminar</button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
