@@ -88,4 +88,49 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ---------------------------------------------------------------
+
+  // ------------------- PREVIA DE SUBIDA DE IMÁGENES -------------
+  const inputImagenes = document.getElementById('imagenes');
+  const preview = document.getElementById('preview');
+  const btnCapturar = document.getElementById('btn-capturar');
+  const capturaInput = document.getElementById('capture-input');
+  let archivosSeleccionados = [];
+
+  const actualizarInput = () => {
+    const dt = new DataTransfer();
+    archivosSeleccionados.forEach(f => dt.items.add(f));
+    if (inputImagenes) {
+      inputImagenes.files = dt.files;
+    }
+  };
+
+  const agregarArchivos = (files) => {
+    Array.from(files).forEach(file => {
+      if (!file.type.startsWith('image/')) return;
+      archivosSeleccionados.push(file);
+      if (preview) {
+        const img = document.createElement('img');
+        img.className = 'img-thumbnail preview-thumb';
+        img.src = URL.createObjectURL(file);
+        preview.appendChild(img);
+      }
+    });
+    actualizarInput();
+  };
+
+  if (inputImagenes) {
+    inputImagenes.addEventListener('change', (e) => {
+      agregarArchivos(e.target.files);
+      inputImagenes.value = '';
+    });
+  }
+
+  if (btnCapturar && capturaInput) {
+    btnCapturar.addEventListener('click', () => capturaInput.click());
+    capturaInput.addEventListener('change', (e) => {
+      agregarArchivos(e.target.files);
+      capturaInput.value = '';
+    });
+  }
+
 });
