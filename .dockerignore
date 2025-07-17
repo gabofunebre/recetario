@@ -1,0 +1,8 @@
+# Exclude persistent data volumes from build context
+# These directories are mounted into containers and should not be copied
+# during Docker image build. Ignoring them also avoids permission errors
+# when the host user lacks access to their contents.
+
+data/
+__pycache__/
+*.py[cod]

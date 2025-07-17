@@ -11,6 +11,7 @@ def create_app():
     # Clave secreta necesaria para sesiones (flash, login, etc.)
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev_secret_key')
 
+
     # Configuración de la URI de la base de datos
     # Por defecto se conecta al contenedor "db" definido en docker-compose.
     database_url = os.getenv(
