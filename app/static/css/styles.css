@@ -48,4 +48,11 @@ body {
   cursor: pointer;
 }
 
+/* Vista previa de subida de imágenes */
+.preview-thumb {
+  width: 1in;
+  height: 1in;
+  object-fit: cover;
+}
+
 /* El resto de tu CSS queda igual... */

@@ -57,7 +57,12 @@
 
     <div class="mb-4">
       <label for="imagenes" class="form-label">Imágenes del proceso</label>
-      <input type="file" id="imagenes" name="imagenes" class="form-control" accept="image/*" multiple>
+      <div class="input-group">
+        <input type="file" id="imagenes" name="imagenes" class="form-control" accept="image/*" multiple>
+        <button type="button" class="btn btn-outline-secondary" id="btn-capturar">Tomar foto</button>
+        <input type="file" id="capture-input" accept="image/*" capture="environment" style="display:none">
+      </div>
+      <div id="preview" class="d-flex flex-wrap gap-2 mt-2"></div>
     </div>
 
     <div class="d-grid mb-4">
