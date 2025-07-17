@@ -10,17 +10,22 @@
   <div class="row">
     {% for receta in recetas %}
       <div class="col-md-4 mb-3">
-        <div class="card h-100">
+        <div class="card h-100 position-relative">
           <div class="card-body">
             <h5 class="card-title">{{ receta.nombre }}</h5>
             {% if receta.descripcion %}
               <p class="card-text">{{ receta.descripcion }}</p>
             {% endif %}
-            <div class="d-flex gap-1">
-              <a href="{{ url_for('main.mostrar_receta', id=receta.id) }}" class="btn btn-primary btn-sm flex-fill">Ver Receta</a>
-              <a href="{{ url_for('main.editar_receta', id=receta.id) }}" class="btn btn-success btn-sm flex-fill">Editar</a>
-              <form method="POST" action="{{ url_for('main.eliminar_receta', id=receta.id) }}" class="flex-fill" onsubmit="return confirm('¿Eliminar esta receta?');">
-                <button type="submit" class="btn btn-danger btn-sm w-100">Eliminar</button>
+            <a href="{{ url_for('main.mostrar_receta', id=receta.id) }}" class="btn btn-primary btn-sm w-100">Ver Receta</a>
+            <div class="position-absolute top-0 end-0 d-flex flex-column gap-2 p-1">
+              <a href="{{ url_for('main.editar_receta', id=receta.id) }}" class="btn btn-success btn-sm icon-btn" title="Editar">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <form method="POST" action="{{ url_for('main.eliminar_receta', id=receta.id) }}" onsubmit="return confirm('¿Eliminar esta receta?');">
+                <button type="submit" class="btn btn-danger btn-sm icon-btn" title="Eliminar">
+                  <i class="bi bi-x"></i>
+                </button>
+
               </form>
             </div>
           </div>

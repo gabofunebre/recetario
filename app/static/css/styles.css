@@ -79,4 +79,14 @@ body {
   padding: 0;
 }
 
+/* Small square icon buttons */
+.icon-btn {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* El resto de tu CSS queda igual... */
