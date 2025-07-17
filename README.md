@@ -54,15 +54,17 @@ make migrate
 
 ### 4. Persistencia y respaldo de la base de datos
 La base de datos se guarda de forma persistente fuera del contenedor. El archivo
-`recetario.db` se monta en el contenedor desde:
+`recetario.db` se monta desde la carpeta `data` del proyecto mediante el
+`docker-compose.yml`:
 
 ```
-/srv/dev-disk-by-uuid-1735d6ab-2a75-4dc4-91a9-b81bb3fda73d/Servicios/Recetario/base_de_datos/recetario.db
+./data/recetario.db:/app/recetario.db
 ```
 
-Para realizar un *backup* simplemente copia ese archivo a la ubicación de tu
-preferencia. Asimismo, la carpeta de configuración local se mantiene en
-`/srv/dev-disk-by-uuid-1735d6ab-2a75-4dc4-91a9-b81bb3fda73d/Servicios/Recetario/recetario/instance`.
+Antes de levantar los contenedores asegúrate de crear la carpeta `data/` (el
+archivo será generado automáticamente). Para realizar un *backup* simplemente
+copia `data/recetario.db` a la ubicación de tu preferencia. La carpeta de
+configuración local se mantiene en `instance/`.
 
 ## Comandos útiles en el Makefile
 
