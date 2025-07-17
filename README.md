@@ -72,6 +72,8 @@ configuración local sigue estando en `instance/`.
 
 Adicionalmente, las imágenes que suba la aplicación se almacenarán en
 `data/images/`, por lo que también puedes respaldar esa carpeta si la utilizas.
+Esta carpeta del host se monta en el contenedor como `/app/data/images`,
+asegurando que las imágenes persistan aunque se reinicie el servicio.
 
 ## Comandos útiles en el Makefile
 
