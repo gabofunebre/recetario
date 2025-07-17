@@ -82,6 +82,8 @@ def crear_receta():
 
         # Guardar imágenes si se subieron
         archivos = request.files.getlist('imagenes')
+        if not archivos:
+            archivos = request.files.getlist('imagenes[]')
         if archivos:
             carpeta = os.path.join(current_app.config['IMAGE_UPLOADS'], str(receta.id))
             os.makedirs(carpeta, exist_ok=True)
@@ -150,6 +152,8 @@ def editar_receta(id):
                 os.remove(path)
         # Guardar nuevas imágenes
         archivos = request.files.getlist('imagenes')
+        if not archivos:
+            archivos = request.files.getlist('imagenes[]')
         if archivos:
             os.makedirs(carpeta, exist_ok=True)
             for f in archivos:
