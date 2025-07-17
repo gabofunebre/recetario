@@ -58,9 +58,13 @@ make migrate
 ```
 
 ### 4. Persistencia y respaldo de la base de datos
-La aplicación utiliza PostgreSQL como base de datos, la cual se ejecuta en un
-contenedor separado. Los datos se almacenan en la carpeta `data/db/` de este
-proyecto, que se monta dentro del contenedor de PostgreSQL.
+
+La aplicación utiliza PostgreSQL como base de datos, ejecutada en un contenedor
+separado. Los datos se almacenan en la carpeta `data/db/` de este proyecto.
+Dentro del contenedor se usa la variable `PGDATA` para guardar la información en
+`/var/lib/postgresql/data/pgdata`, de modo que `data/db/` puede contener archivos
+de mantenimiento (como `.gitkeep`) sin interferir con la base de datos.
+
 
 Para realizar un *backup* basta con copiar el contenido de `data/db/` o emplear
 las herramientas de respaldo de PostgreSQL según tus necesidades. La carpeta de

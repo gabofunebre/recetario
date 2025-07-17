@@ -25,11 +25,12 @@ services:
       POSTGRES_DB: recetario
       POSTGRES_USER: recetario
       POSTGRES_PASSWORD: recetario
+      PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
-
       - ./data/db:/var/lib/postgresql/data
     networks:
       - nginx_net
+
 networks:
   nginx_net:
     external: true
