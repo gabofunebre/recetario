@@ -23,27 +23,31 @@
     <div id="ingredientes-container" class="mb-4">
       {% for ing in receta.ingredientes %}
       <div class="row g-2 align-items-end mb-2 ingrediente">
-        <div class="col-md-5">
+        <div class="col-12 col-md-5">
           <input type="text" name="ingredientes[]" class="form-control" placeholder="Ingrediente" required value="{{ ing.nombre }}">
         </div>
-        <div class="col-md-3">
-          <input type="number" name="cantidades[]" class="form-control" placeholder="Cantidad" required value="{{ ing.cantidad }}">
-        </div>
-        <div class="col-md-3">
-          <select name="unidades[]" class="form-select">
-            <option value="gramos" {% if ing.unidad == 'gramos' %}selected{% endif %}>Gramos</option>
-            <option value="kilogramos" {% if ing.unidad == 'kilogramos' %}selected{% endif %}>Kilogramos</option>
-            <option value="ml" {% if ing.unidad == 'ml' %}selected{% endif %}>Mililitros</option>
-            <option value="litros" {% if ing.unidad == 'litros' %}selected{% endif %}>Litros</option>
-            <option value="unidad" {% if ing.unidad == 'unidad' %}selected{% endif %}>Unidad</option>
-            <option value="puñado" {% if ing.unidad == 'puñado' %}selected{% endif %}>Puñado</option>
-            <option value="taza" {% if ing.unidad == 'taza' %}selected{% endif %}>Taza</option>
-            <option value="cucharada" {% if ing.unidad == 'cucharada' %}selected{% endif %}>Cucharada</option>
-            <option value="cucharadita" {% if ing.unidad == 'cucharadita' %}selected{% endif %}>Cucharadita</option>
-          </select>
-        </div>
-        <div class="col-md-1 text-end">
-          <button type="button" class="btn btn-outline-danger btn-remove" title="Eliminar ingrediente">&times;</button>
+        <div class="col-12 col-md-7">
+          <div class="row g-2">
+            <div class="col-4 col-md-5">
+              <input type="number" name="cantidades[]" class="form-control" placeholder="Cantidad" required value="{{ ing.cantidad }}">
+            </div>
+            <div class="col-5 col-md-5">
+              <select name="unidades[]" class="form-select">
+                <option value="gramos" {% if ing.unidad == 'gramos' %}selected{% endif %}>Gramos</option>
+                <option value="kilogramos" {% if ing.unidad == 'kilogramos' %}selected{% endif %}>Kilogramos</option>
+                <option value="ml" {% if ing.unidad == 'ml' %}selected{% endif %}>Mililitros</option>
+                <option value="litros" {% if ing.unidad == 'litros' %}selected{% endif %}>Litros</option>
+                <option value="unidad" {% if ing.unidad == 'unidad' %}selected{% endif %}>Unidad</option>
+                <option value="puñado" {% if ing.unidad == 'puñado' %}selected{% endif %}>Puñado</option>
+                <option value="taza" {% if ing.unidad == 'taza' %}selected{% endif %}>Taza</option>
+                <option value="cucharada" {% if ing.unidad == 'cucharada' %}selected{% endif %}>Cucharada</option>
+                <option value="cucharadita" {% if ing.unidad == 'cucharadita' %}selected{% endif %}>Cucharadita</option>
+              </select>
+            </div>
+            <div class="col-3 col-md-2 text-end">
+              <button type="button" class="btn btn-outline-danger btn-remove" title="Eliminar ingrediente">&times;</button>
+            </div>
+          </div>
         </div>
       </div>
       {% endfor %}

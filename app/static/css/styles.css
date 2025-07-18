@@ -108,3 +108,13 @@ body {
 }
 
 /* El resto de tu CSS queda igual... */
+
+@media (max-width: 576px) {
+  #ingredientes-container .ingrediente {
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 0.5rem;
+  }
+  #ingredientes-container .ingrediente:last-child {
+    border-bottom: 0;
+  }
+}
