@@ -5,7 +5,7 @@
 {% block content %}
   <h1 class="mb-4">Editar Receta</h1>
 
-  <form method="POST" enctype="multipart/form-data" id="form-receta" data-api-autores="{{ url_for('main.api_autores') }}">
+  <form method="POST" enctype="multipart/form-data" id="form-receta" data-api-autores="{{ url_for('main.api_autores') }}" class="position-relative">
     <div class="row g-3 mb-4">
       <div class="col-md-8">
         <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Nombre de la Receta" required value="{{ receta.nombre }}">
@@ -85,6 +85,11 @@
 
     <div class="d-grid mb-2">
       <button type="submit" class="btn btn-success btn-lg">Editar Receta</button>
+    </div>
+    <div id="loading-overlay" class="form-overlay">
+      <div class="spinner-border text-success" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
     </div>
     <div class="d-grid mb-4">
       <a href="{{ url_for('main.ver_recetas') }}" class="btn btn-secondary btn-lg">Cancelar</a>
