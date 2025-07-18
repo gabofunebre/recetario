@@ -96,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnCapturar = document.getElementById('btn-capturar');
   const capturaInput = document.getElementById('capture-input');
   const formReceta = document.getElementById('form-receta');
+  const overlay = document.getElementById('loading-overlay');
   let archivosSeleccionados = [];
   const renderPreviews = () => {
     if (!preview) return;
@@ -165,6 +166,10 @@ document.addEventListener('DOMContentLoaded', () => {
     formReceta.addEventListener('submit', (e) => {
       e.preventDefault();
 
+      if (overlay) {
+        overlay.classList.add('active');
+      }
+
       console.log('🧾 Enviando manualmente...');
       console.log('Archivos seleccionados:', archivosSeleccionados);
 
@@ -187,8 +192,16 @@ document.addEventListener('DOMContentLoaded', () => {
       })
       .then(data => {
         if (data) console.log('Respuesta del servidor:', data);
+        if (overlay) {
+          overlay.classList.remove('active');
+        }
       })
-      .catch(err => console.error('Error al enviar:', err));
+      .catch(err => {
+        console.error('Error al enviar:', err);
+        if (overlay) {
+          overlay.classList.remove('active');
+        }
+      });
     });
   }
 
