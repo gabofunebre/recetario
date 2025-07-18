@@ -22,27 +22,31 @@
 
     <div id="ingredientes-container" class="mb-4">
       <div class="row g-2 align-items-end mb-2 ingrediente">
-        <div class="col-md-5">
+        <div class="col-12 col-md-5">
           <input type="text" name="ingredientes[]" class="form-control" placeholder="Ingrediente" required>
         </div>
-        <div class="col-md-3">
-          <input type="number" name="cantidades[]" class="form-control" placeholder="Cantidad" required>
-        </div>
-        <div class="col-md-3">
-          <select name="unidades[]" class="form-select">
-            <option value="gramos">Gramos</option>
-            <option value="kilogramos">Kilogramos</option>
-            <option value="ml">Mililitros</option>
-            <option value="litros">Litros</option>
-            <option value="unidad">Unidad</option>
-            <option value="puñado">Puñado</option>
-            <option value="taza">Taza</option>
-            <option value="cucharada">Cucharada</option>
-            <option value="cucharadita">Cucharadita</option>
-          </select>
-        </div>
-        <div class="col-md-1 text-end">
-          <button type="button" class="btn btn-outline-danger btn-remove" title="Eliminar ingrediente">&times;</button>
+        <div class="col-12 col-md-7">
+          <div class="row g-2">
+            <div class="col-4 col-md-5">
+              <input type="number" name="cantidades[]" class="form-control" placeholder="Cantidad" required>
+            </div>
+            <div class="col-5 col-md-5">
+              <select name="unidades[]" class="form-select">
+                <option value="gramos">Gramos</option>
+                <option value="kilogramos">Kilogramos</option>
+                <option value="ml">Mililitros</option>
+                <option value="litros">Litros</option>
+                <option value="unidad">Unidad</option>
+                <option value="puñado">Puñado</option>
+                <option value="taza">Taza</option>
+                <option value="cucharada">Cucharada</option>
+                <option value="cucharadita">Cucharadita</option>
+              </select>
+            </div>
+            <div class="col-3 col-md-2 text-end">
+              <button type="button" class="btn btn-outline-danger btn-remove" title="Eliminar ingrediente">&times;</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
