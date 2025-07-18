@@ -6,7 +6,7 @@ Una aplicación de recetas donde los usuarios pueden consultar, agregar, editar 
 La versión actual de la aplicación utiliza **PostgreSQL** como base de datos en lugar de SQLite. Todo se ejecuta dentro de contenedores Docker para facilitar la configuración y la persistencia de los datos.
 
 ## Estructura de directorios
-
+```
 recetario/
 ├── app/                # Lógica de la aplicación Flask (run.py, models y routes)
 ├── instance/           # Configuraciones locales
@@ -19,6 +19,7 @@ recetario/
 ├── requirements.txt    # Dependencias del proyecto
 └── Makefile            # Script para facilitar la gestión del contenedor
 
+```
 ## Requisitos
 
 - Python 3.7 o superior
