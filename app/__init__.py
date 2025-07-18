@@ -1,6 +1,7 @@
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash
 
 # Instancia global de SQLAlchemy (la usás en models.py)
 db = SQLAlchemy()
@@ -43,6 +44,13 @@ def create_app():
         from . import routes, models
         from .routes import main  # Blueprint principal
         app.register_blueprint(main)
+
+        # Crear usuario administrador por defecto
+        from .models import Usuario
+        if not Usuario.query.filter_by(is_admin=True).first():
+            admin = Usuario(nombre='admin', password_hash=generate_password_hash('admin'), is_admin=True)
+            db.session.add(admin)
+            db.session.commit()
 
         # Crear las tablas si aún no existen
         try:

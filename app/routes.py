@@ -1,5 +1,6 @@
-from flask import render_template, request, redirect, url_for, Blueprint, jsonify, flash, current_app, send_from_directory
+from flask import render_template, request, redirect, url_for, Blueprint, jsonify, flash, current_app, send_from_directory, session, abort
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
 from .models import Usuario, Receta, Ingrediente
 import json
@@ -9,6 +10,22 @@ import os
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 main = Blueprint('main', __name__)
+
+def login_required(func):
+    def wrapper(*args, **kwargs):
+        if not session.get('user_id'):
+            return redirect(url_for('main.login'))
+        return func(*args, **kwargs)
+    wrapper.__name__ = func.__name__
+    return wrapper
+
+def admin_required(func):
+    def wrapper(*args, **kwargs):
+        if not session.get('is_admin'):
+            abort(403)
+        return func(*args, **kwargs)
+    wrapper.__name__ = func.__name__
+    return wrapper
 
 @main.route('/images/<path:filename>')
 def images(filename):
@@ -25,8 +42,50 @@ def _get_uploaded_images():
         archivos = request.files.getlist('imagenes[]')
     return archivos
 
+# ----------------------- AUTENTICACIÓN -----------------------
+
+@main.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        nombre = request.form.get('nombre', '').strip()
+        clave = request.form.get('clave', '')
+        user = Usuario.query.filter_by(nombre=nombre).first()
+        if user and check_password_hash(user.password_hash, clave):
+            session['user_id'] = user.id
+            session['is_admin'] = user.is_admin
+            flash(f"Bienvenido {user.nombre}. Puedes ver todas las recetas pero editar solo las propias.")
+            return redirect(url_for('main.index'))
+        flash('Credenciales incorrectas')
+    return render_template('login.html')
+
+
+@main.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('main.login'))
+
+
+@main.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        nombre = request.form.get('nombre', '').strip()
+        clave = request.form.get('clave', '')
+        if not nombre or not clave:
+            flash('Completa todos los campos')
+        elif Usuario.query.filter_by(nombre=nombre).first():
+            flash('El usuario ya existe')
+        else:
+            user = Usuario(nombre=nombre, password_hash=generate_password_hash(clave))
+            db.session.add(user)
+            db.session.commit()
+            flash('Usuario creado, inicia sesión')
+            return redirect(url_for('main.login'))
+    return render_template('register.html')
+
 @main.route('/')
 def index():
+    if not session.get('user_id'):
+        return redirect(url_for('main.login'))
     return render_template('index.html')
 
 # Serialización de recetas para API
@@ -59,6 +118,7 @@ def api_autores():
 
 
 @main.route('/crear_receta', methods=['GET', 'POST'])
+@login_required
 def crear_receta():
     if request.method == 'POST':
         nombre = request.form.get('nombre', '').strip()
@@ -74,7 +134,8 @@ def crear_receta():
             nombre=nombre,
             autor=autor,
             descripcion=descripcion,
-            metodo=metodo
+            metodo=metodo,
+            usuario_id=session.get('user_id')
         )
         db.session.add(receta)
         db.session.commit()
@@ -124,11 +185,15 @@ def ver_recetas():
     if query:
         mensaje = f"No se encontraron resultados para '{query}'. Mostrando todas las recetas."  
     recetas = Receta.query.all()
-    return render_template('recetas.html', recetas=recetas, mensaje=mensaje)
+    usuarios = Usuario.query.all()
+    return render_template('recetas.html', recetas=recetas, mensaje=mensaje, usuarios=usuarios)
 
 @main.route('/receta/<int:id>/editar', methods=['GET', 'POST'])
+@login_required
 def editar_receta(id):
     receta = Receta.query.get_or_404(id)
+    if not (session.get('is_admin') or session.get('user_id') == receta.usuario_id):
+        abort(403)
     carpeta = os.path.join(current_app.config['IMAGE_UPLOADS'], str(id))
     if request.method == 'POST':
         nombre = request.form.get('nombre', '').strip()
@@ -185,8 +250,11 @@ def editar_receta(id):
 
 
 @main.route('/receta/<int:id>/eliminar', methods=['POST'])
+@login_required
 def eliminar_receta(id):
     receta = Receta.query.get_or_404(id)
+    if not (session.get('is_admin') or session.get('user_id') == receta.usuario_id):
+        abort(403)
     db.session.delete(receta)
     db.session.commit()
     carpeta = os.path.join(current_app.config['IMAGE_UPLOADS'], str(id))
@@ -195,3 +263,52 @@ def eliminar_receta(id):
         shutil.rmtree(carpeta)
     flash('Receta eliminada correctamente')
     return redirect(url_for('main.ver_recetas'))
+
+
+@main.route('/receta/<int:id>/configurar', methods=['POST'])
+@login_required
+@admin_required
+def configurar_receta(id):
+    receta = Receta.query.get_or_404(id)
+    usuario_id = request.form.get('usuario_id', type=int)
+    user = Usuario.query.get(usuario_id)
+    if user:
+        receta.usuario_id = user.id
+        db.session.commit()
+        flash('Propietario actualizado')
+    return redirect(url_for('main.ver_recetas'))
+
+
+@main.route('/admin/usuarios')
+@login_required
+@admin_required
+def admin_usuarios():
+    usuarios = Usuario.query.all()
+    return render_template('admin_users.html', usuarios=usuarios)
+
+
+@main.route('/admin/usuarios/<int:id>/eliminar', methods=['POST'])
+@login_required
+@admin_required
+def eliminar_usuario(id):
+    user = Usuario.query.get_or_404(id)
+    if user.is_admin:
+        abort(403)
+    Receta.query.filter_by(usuario_id=user.id).update({'usuario_id': None})
+    db.session.delete(user)
+    db.session.commit()
+    flash('Usuario eliminado')
+    return redirect(url_for('main.admin_usuarios'))
+
+
+@main.route('/admin/usuarios/<int:id>/password', methods=['POST'])
+@login_required
+@admin_required
+def cambiar_password(id):
+    user = Usuario.query.get_or_404(id)
+    clave = request.form.get('clave', '')
+    if clave:
+        user.password_hash = generate_password_hash(clave)
+        db.session.commit()
+        flash('Contraseña actualizada')
+    return redirect(url_for('main.admin_usuarios'))
