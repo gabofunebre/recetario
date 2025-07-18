@@ -95,15 +95,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const preview = document.getElementById('preview');
   const btnCapturar = document.getElementById('btn-capturar');
   const capturaInput = document.getElementById('capture-input');
+  const formReceta = document.getElementById('form-receta');
   let archivosSeleccionados = [];
-
-  const actualizarInput = () => {
-    const dt = new DataTransfer();
-    archivosSeleccionados.forEach(f => dt.items.add(f));
-    if (inputImagenes) {
-      inputImagenes.files = dt.files;
-    }
-  };
   const renderPreviews = () => {
     if (!preview) return;
     preview.innerHTML = '';
@@ -122,7 +115,6 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.addEventListener('click', () => {
         archivosSeleccionados.splice(idx, 1);
         renderPreviews();
-        actualizarInput();
       });
       wrapper.appendChild(img);
       wrapper.appendChild(btn);
@@ -136,8 +128,6 @@ document.addEventListener('DOMContentLoaded', () => {
       archivosSeleccionados.push(file);
     });
     renderPreviews();
-
-    actualizarInput();
   };
 
   if (inputImagenes) {
@@ -157,7 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ------------------- ELIMINAR IMÁGENES EXISTENTES -------------
   const contActuales = document.getElementById('imagenes-actuales');
-  const formReceta = document.getElementById('form-receta');
   if (contActuales && formReceta) {
     contActuales.querySelectorAll('.eliminar-imagen').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -169,6 +158,37 @@ document.addEventListener('DOMContentLoaded', () => {
         input.value = btn.dataset.img;
         formReceta.appendChild(input);
       });
+    });
+  }
+
+  if (formReceta) {
+    formReceta.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      console.log('🧾 Enviando manualmente...');
+      console.log('Archivos seleccionados:', archivosSeleccionados);
+
+      const formData = new FormData(formReceta);
+
+      archivosSeleccionados.forEach((file) => {
+        formData.append('imagenes[]', file);
+      });
+
+      fetch(formReceta.action, {
+        method: 'POST',
+        body: formData,
+      })
+      .then(res => {
+        if (res.redirected) {
+          window.location.href = res.url;
+        } else {
+          return res.text();
+        }
+      })
+      .then(data => {
+        if (data) console.log('Respuesta del servidor:', data);
+      })
+      .catch(err => console.error('Error al enviar:', err));
     });
   }
 
