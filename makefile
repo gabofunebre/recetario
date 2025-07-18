@@ -24,9 +24,8 @@ test:
 	make run pytest
 
 restart:
-    make down
-    make up
-
+	make down
+	make up
 
 ps:
 	docker ps
