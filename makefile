@@ -23,17 +23,10 @@ migrate:
 test:
 	make run pytest
 
-seed:
-	make run python app/seed.py
-
 restart:
-	make down
-	make up
+    make down
+    make up
 
-restart-seed:
-	make down
-	make up
-	make seed
 
 ps:
 	docker ps

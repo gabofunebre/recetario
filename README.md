@@ -7,17 +7,17 @@ La versión actual de la aplicación utiliza **PostgreSQL** como base de datos e
 
 ## Estructura de directorios
 
-/srv/dev-disk-by-uuid-1735d6ab-2a75-4dc4-91a9-b81bb3fda73d/Servicios/Recetario/recetario/
-├── /app/                 # Lógica de la aplicación Flask (incluye `run.py` y `seed.py`)
-├── /instance/            # Configuraciones locales
-├── /data/
-│   ├── /db/              # Datos persistentes de PostgreSQL
-│   └── /images/          # Carpeta para imágenes
-├── /__pycache__/          # Archivos compilados de Python
-├── Dockerfile             # Instrucciones para crear la imagen Docker
-├── docker-compose.yml     # Composición de los contenedores Docker
-├── requirements.txt       # Dependencias del proyecto
-└── Makefile               # Script para facilitar la gestión del contenedor
+recetario/
+├── app/                # Lógica de la aplicación Flask (run.py, models y routes)
+├── instance/           # Configuraciones locales
+├── data/
+│   ├── db/             # Datos persistentes de PostgreSQL
+│   └── images/         # Carpeta para imágenes
+├── __pycache__/        # Archivos compilados de Python
+├── Dockerfile          # Instrucciones para crear la imagen Docker
+├── docker-compose.yml  # Composición de los contenedores Docker
+├── requirements.txt    # Dependencias del proyecto
+└── Makefile            # Script para facilitar la gestión del contenedor
 
 ## Requisitos
 
@@ -84,7 +84,6 @@ Asegúrate de que la aplicación tenga permisos de escritura en `data/images/`.
 - **make logs**: Muestra los logs del contenedor.
 - **make shell**: Abre una terminal dentro del contenedor.
 - **make migrate**: Aplica las migraciones de base de datos (Flask).
-- **make seed**: Carga datos iniciales en la base de datos.
 - **make pull**: Actualiza el repositorio con los cambios más recientes de GitHub.
 
 ## Contribuciones
