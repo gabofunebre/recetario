@@ -45,13 +45,6 @@ def create_app():
         from .routes import main  # Blueprint principal
         app.register_blueprint(main)
 
-        # Crear usuario administrador por defecto
-        from .models import Usuario
-        if not Usuario.query.filter_by(is_admin=True).first():
-            admin = Usuario(nombre='admin', password_hash=generate_password_hash('admin'), is_admin=True)
-            db.session.add(admin)
-            db.session.commit()
-
         # Crear las tablas si aún no existen
         try:
             db.create_all()
@@ -59,6 +52,13 @@ def create_app():
             _tables_created = True
         except Exception as e:
             app.logger.error(f"Error al crear las tablas: {e}")
+
+        # Crear usuario administrador por defecto
+        from .models import Usuario
+        if not Usuario.query.filter_by(is_admin=True).first():
+            admin = Usuario(nombre='admin', password_hash=generate_password_hash('admin'), is_admin=True)
+            db.session.add(admin)
+            db.session.commit()
 
     def _ensure_tables_exist():
         """Intenta crear las tablas si aún no fueron creadas."""
