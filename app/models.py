@@ -6,10 +6,13 @@ class Usuario(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), nullable=False, unique=True)
-    posicion = db.Column(db.String(100), nullable=True)
+    password_hash = db.Column(db.String(255), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
+
+    recetas = db.relationship('Receta', back_populates='usuario', lazy=True)
 
     def __repr__(self):
-        return f"<Usuario {self.nombre} ({self.posicion})>"
+        return f"<Usuario {self.nombre} (admin={self.is_admin})>"
 
 
 
@@ -22,6 +25,9 @@ class Receta(db.Model):
     autor = db.Column(db.String(255), nullable=False)
     descripcion = db.Column(db.Text, nullable=True)
     metodo = db.Column(db.Text, nullable=False)
+
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'))
+    usuario = db.relationship('Usuario', back_populates='recetas')
 
 
 

@@ -22,6 +22,7 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
+          {% if session.get('user_id') %}
           <li class="nav-item">
             <a class="nav-link {% if request.endpoint == 'main.crear_receta' %}active{% endif %}"
                href="{{ url_for('main.crear_receta') }}">Nueva Receta</a>
@@ -30,6 +31,20 @@
             <a class="nav-link {% if request.endpoint == 'main.ver_recetas' %}active{% endif %}"
                href="{{ url_for('main.ver_recetas') }}">Todas las recetas</a>
           </li>
+          {% if session.get('is_admin') %}
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint == 'main.admin_usuarios' %}active{% endif %}"
+               href="{{ url_for('main.admin_usuarios') }}">Usuarios</a>
+          </li>
+          {% endif %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('main.logout') }}">Salir</a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('main.login') }}">Ingresar</a>
+          </li>
+          {% endif %}
         </ul>
       </div>
     </div>
