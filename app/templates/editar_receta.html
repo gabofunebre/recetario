@@ -29,7 +29,7 @@
         <div class="col-12 col-md-7">
           <div class="row g-2">
             <div class="col-4 col-md-5">
-              <input type="number" name="cantidades[]" class="form-control" placeholder="Cantidad" required value="{{ ing.cantidad }}">
+              <input type="text" name="cantidades[]" class="form-control" placeholder="Cantidad" required inputmode="decimal" pattern="^[0-9]+([\\.,][0-9]+)?$" value="{{ ing.cantidad }}">
             </div>
             <div class="col-5 col-md-5">
               <select name="unidades[]" class="form-select">
