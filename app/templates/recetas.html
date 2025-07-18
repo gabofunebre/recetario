@@ -18,6 +18,7 @@
             {% endif %}
             <a href="{{ url_for('main.mostrar_receta', id=receta.id) }}" class="btn btn-primary btn-sm w-100">Ver Receta</a>
             <div class="position-absolute top-0 end-0 d-flex flex-column gap-2 p-1">
+              {% if session.get('user_id') and (session.get('is_admin') or session.get('user_id') == receta.usuario_id) %}
               <a href="{{ url_for('main.editar_receta', id=receta.id) }}" class="btn btn-success btn-sm icon-btn" title="Editar">
                 <i class="bi bi-pencil"></i>
               </a>
@@ -25,9 +26,40 @@
                 <button type="submit" class="btn btn-danger btn-sm icon-btn" title="Eliminar">
                   <i class="bi bi-x"></i>
                 </button>
-
               </form>
+              {% if session.get('is_admin') %}
+              <button type="button" class="btn btn-secondary btn-sm icon-btn" data-bs-toggle="modal" data-bs-target="#cfg{{ receta.id }}" title="Configurar">
+                <i class="bi bi-gear"></i>
+              </button>
+              {% endif %}
+              {% endif %}
             </div>
+            {% if session.get('is_admin') %}
+            <!-- Modal configuración -->
+            <div class="modal fade" id="cfg{{ receta.id }}" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <form method="POST" action="{{ url_for('main.configurar_receta', id=receta.id) }}">
+                    <div class="modal-header">
+                      <h5 class="modal-title">Propietario</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                      <select name="usuario_id" class="form-select">
+                        {% for u in usuarios %}
+                        <option value="{{ u.id }}" {% if u.id == receta.usuario_id %}selected{% endif %}>{{ u.nombre }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                      <button type="submit" class="btn btn-primary">Confirmar</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            {% endif %}
           </div>
         </div>
       </div>

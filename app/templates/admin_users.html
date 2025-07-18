@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Administrar usuarios{% endblock %}
+{% block content %}
+<h1 class="mb-4">Usuarios</h1>
+<table class="table">
+  <thead>
+    <tr><th>Nombre</th><th>Admin</th><th></th></tr>
+  </thead>
+  <tbody>
+    {% for u in usuarios %}
+    <tr>
+      <td>{{ u.nombre }}</td>
+      <td>{% if u.is_admin %}Sí{% else %}No{% endif %}</td>
+      <td>
+        {% if not u.is_admin %}
+        <form method="POST" action="{{ url_for('main.eliminar_usuario', id=u.id) }}" class="d-inline" onsubmit="return confirm('¿Eliminar usuario?');">
+          <button class="btn btn-danger btn-sm">Eliminar</button>
+        </form>
+        {% endif %}
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#pass{{ u.id }}">Contraseña</button>
+        <div class="modal fade" id="pass{{ u.id }}" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <form method="POST" action="{{ url_for('main.cambiar_password', id=u.id) }}">
+                <div class="modal-header">
+                  <h5 class="modal-title">Cambiar contraseña</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                  <input type="password" name="clave" class="form-control" placeholder="Nueva contraseña" required>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                  <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
