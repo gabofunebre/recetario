@@ -1,4 +1,4 @@
-CONTAINER=app_recetario-recetario-1
+CONTAINER=recetario-recetario-1
 
 # Comando para correr algo dentro del contenedor
 run:
