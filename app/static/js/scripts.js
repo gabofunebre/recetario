@@ -205,4 +205,36 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ------------------- COMPARTIR RECETA -----------------------
+  const btnCompartir = document.getElementById('btn-compartir');
+  const contReceta = document.getElementById('receta-detalle');
+  if (btnCompartir && contReceta) {
+    btnCompartir.addEventListener('click', async () => {
+      try {
+        const canvas = await html2canvas(contReceta);
+        canvas.toBlob(async (blob) => {
+          if (!blob) return;
+          const file = new File([blob], 'receta.png', { type: 'image/png' });
+          if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+            try {
+              await navigator.share({ files: [file], title: btnCompartir.dataset.title || 'Receta' });
+            } catch (err) {
+              console.error('Error al compartir:', err);
+            }
+          } else {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'receta.png';
+            a.target = '_blank';
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+          }
+        });
+      } catch (err) {
+        console.error('Error al generar imagen:', err);
+      }
+    });
+  }
+
 });
