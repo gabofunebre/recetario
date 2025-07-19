@@ -3,6 +3,7 @@
 {% block title %}{{ receta.nombre }}{% endblock %}
 
 {% block content %}
+<div id="receta-detalle">
   <div class="mb-4">
     <h1>{{ receta.nombre }}</h1>
     <p class="text-muted">Autor: {{ receta.autor }}</p>
@@ -79,8 +80,12 @@
     </div>
   {% endif %}
 
+</div> <!-- cierre receta-detalle -->
+
   <div class="d-flex gap-2">
   <a href="{{ url_for('main.ver_recetas') }}" class="btn btn-secondary">Todas las Recetas</a>
-  <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary">Volver al Buscador</a>
-</div>
+  <button type="button" id="btn-compartir" class="btn btn-primary" data-title="{{ receta.nombre }}">
+    <i class="bi bi-share"></i> Compartir
+  </button>
+  </div>
 {% endblock %}
