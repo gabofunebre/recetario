@@ -1,8 +1,9 @@
 
 # Recetario App
 
-Una aplicación de recetas donde los usuarios pueden consultar, agregar, editar y eliminar recetas.
-
+Una aplicación de recetas desarrollada con Flask que incluye registro y autenticación de usuarios.
+Cada usuario puede agregar, editar y eliminar sus propias recetas, y un administrador puede gestionar las cuentas.
+Las recetas cuentan con un botón **Compartir** que genera una imagen de la página para enviarla o descargarla.
 La versión actual de la aplicación utiliza **PostgreSQL** como base de datos en lugar de SQLite. Todo se ejecuta dentro de contenedores Docker para facilitar la configuración y la persistencia de los datos.
 
 ## Estructura de directorios
