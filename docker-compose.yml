@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   recetario:
     build: .
@@ -31,6 +29,7 @@ services:
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - ./data/db:/var/lib/postgresql/data
+    restart: always
     networks:
       - nginx_net
 
