@@ -1,8 +1,8 @@
 services:
   recetario:
     build: .
-    ports:
-      - "1881:5000"
+    expose:
+      - "5000"
     volumes:
       - ./:/app
       - ./instance:/app/instance
@@ -10,29 +10,35 @@ services:
     environment:
       - FLASK_APP=app/run.py
       - FLASK_ENV=development
-      - DATABASE_URL=postgresql://recetario:recetario@db:5433/recetario
+      - DATABASE_URL=postgresql://recetario:recetario@db:5432/recetario
     depends_on:
-      - db
+      db:
+        condition: service_healthy   # espera a que la DB esté lista
     restart: always
     networks:
-      - nginx_net
+      - recetario_net   # privada primero
+      - nginx_net       # salida por túnel
 
   db:
     image: postgres:15-alpine
-    command: -p 5433
-    ports:
-      - "5433:5433"
     environment:
       POSTGRES_DB: recetario
       POSTGRES_USER: recetario
       POSTGRES_PASSWORD: recetario
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
-      - ./data/db:/var/lib/postgresql/data
+      - ./data/db:/var/lib/postgresql/data  # 🔒 conserva tus datos
+    healthcheck:
+      test: ['CMD-SHELL','pg_isready -U recetario -d recetario -h 127.0.0.1 -p 5432 || exit 1']
+      interval: 5s
+      timeout: 3s
+      retries: 30
     restart: always
     networks:
-      - nginx_net
+      - recetario_net
 
 networks:
   nginx_net:
     external: true
+  recetario_net:
+    name: recetario_net
