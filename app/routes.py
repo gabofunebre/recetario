@@ -1,4 +1,18 @@
-from flask import render_template, request, redirect, url_for, Blueprint, jsonify, flash, current_app, send_from_directory, session, abort
+from flask import (
+    render_template,
+    request,
+    redirect,
+    url_for,
+    Blueprint,
+    jsonify,
+    flash,
+    current_app,
+    send_from_directory,
+    session,
+    abort,
+    Response,
+    stream_with_context,
+)
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
@@ -6,6 +20,9 @@ from .models import Usuario, Receta, Ingrediente
 import json
 
 import os
+import hashlib
+import subprocess
+from functools import wraps
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -28,13 +45,13 @@ def admin_required(func):
     return wrapper
 
 def backup_token_required(func):
+    @wraps(func)
     def wrapper(*args, **kwargs):
-        token = request.headers.get('X-Backup-Token') or request.args.get('token')
-        expected = os.getenv('BACKUP_TOKEN')
+        token = request.headers.get('X-Backup-Token')
+        expected = current_app.config.get('BACKUP_TOKEN') or os.getenv('BACKUP_TOKEN')
         if not expected or token != expected:
-            abort(401)
+            return jsonify({'error': 'Token inválido'}), 403
         return func(*args, **kwargs)
-    wrapper.__name__ = func.__name__
     return wrapper
 
 @main.route('/images/<path:filename>')
@@ -338,3 +355,39 @@ def cambiar_password(id):
         db.session.commit()
         flash('Contraseña actualizada')
     return redirect(url_for('main.admin_usuarios'))
+
+
+@main.route('/backup/export', methods=['POST'])
+@backup_token_required
+def backup_export():
+    db_url = current_app.config['SQLALCHEMY_DATABASE_URI']
+    cmd = ['pg_dump', db_url]
+    try:
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    except Exception as err:
+        current_app.logger.error(f"Error al ejecutar pg_dump: {err}")
+        return jsonify({'error': 'Error al ejecutar pg_dump'}), 500
+
+    sha256 = hashlib.sha256()
+    total = 0
+    chunks = []
+    for chunk in iter(lambda: proc.stdout.read(8192), b''):
+        sha256.update(chunk)
+        total += len(chunk)
+        chunks.append(chunk)
+
+    stderr = proc.stderr.read().decode()
+    ret = proc.wait()
+    if ret != 0:
+        current_app.logger.error(f"pg_dump error: {stderr}")
+        return jsonify({'error': 'pg_dump falló', 'details': stderr.strip()}), 500
+
+    def generate():
+        for c in chunks:
+            yield c
+
+    response = Response(stream_with_context(generate()), mimetype='application/octet-stream')
+    response.headers['X-Checksum-SHA256'] = sha256.hexdigest()
+    response.headers['X-Size'] = str(total)
+    response.headers['X-Format'] = 'sql'
+    return response
