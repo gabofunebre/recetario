@@ -1,6 +1,23 @@
-from flask import render_template, request, redirect, url_for, Blueprint, jsonify, flash, current_app, send_from_directory, session, abort
+from flask import (
+    render_template,
+    request,
+    redirect,
+    url_for,
+    Blueprint,
+    jsonify,
+    flash,
+    current_app,
+    send_from_directory,
+    session,
+    abort,
+    Response,
+    stream_with_context,
+)
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
+import subprocess
+import hashlib
 from . import db
 from .models import Usuario, Receta, Ingrediente
 import json
@@ -41,6 +58,61 @@ def _get_uploaded_images():
     if not archivos:
         archivos = request.files.getlist('imagenes[]')
     return archivos
+
+
+def backup_token_required(func):
+    """Verifica el token Bearer provisto para los respaldos."""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        auth = request.headers.get('Authorization', '')
+        expected = current_app.config.get('BACKUP_TOKEN')
+        if not expected or not auth.startswith('Bearer '):
+            return jsonify({"error": "Unauthorized"}), 401
+        token = auth.split(' ', 1)[1]
+        if token != expected:
+            return jsonify({"error": "Unauthorized"}), 401
+        return func(*args, **kwargs)
+    return wrapper
+
+
+@main.route('/backup/capabilities', methods=['GET'])
+@backup_token_required
+def backup_capabilities():
+    """Ficha técnica del respaldo disponible."""
+    return jsonify({
+        "version": "v1",
+        "types": ["db"],
+        "est_seconds": 120,
+        "est_size": 104857600,
+    })
+
+
+@main.route('/backup/export', methods=['POST'])
+@backup_token_required
+def backup_export():
+    """Genera y entrega el respaldo de la base de datos."""
+    db_url = current_app.config['SQLALCHEMY_DATABASE_URI']
+    try:
+        result = subprocess.run(['pg_dump', db_url], capture_output=True)
+    except FileNotFoundError:
+        return jsonify({"error": "pg_dump not found"}), 500
+
+    if result.returncode != 0:
+        current_app.logger.error(result.stderr.decode())
+        return jsonify({"error": "pg_dump failed"}), 500
+
+    data = result.stdout
+    checksum = hashlib.sha256(data).hexdigest()
+    size = len(data)
+
+    def generate():
+        yield data
+
+    response = Response(stream_with_context(generate()), mimetype='application/octet-stream')
+    response.headers['X-Checksum-SHA256'] = checksum
+    response.headers['X-Size'] = str(size)
+    response.headers['X-Format'] = 'sql'
+    return response
 
 # ----------------------- AUTENTICACIÓN -----------------------
 

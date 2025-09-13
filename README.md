@@ -78,6 +78,30 @@ Esta carpeta del host se monta en el contenedor como `/app/data/images`,
 asegurando que las imágenes persistan aunque se reinicie el servicio.
 Asegúrate de que la aplicación tenga permisos de escritura en `data/images/`.
 
+### Respaldo mediante orquestador
+
+La aplicación expone endpoints internos para que un orquestador solicite y
+suba respaldos automáticamente. Debes definir en un archivo `.env` el token
+`TOKEN_BACKUP`, que será leído por el servicio.
+
+**Endpoints disponibles**
+
+- `GET /backup/capabilities`: informa las capacidades de respaldo
+  (`{"version":"v1","types":["db"],"est_seconds":120,"est_size":104857600}`).
+- `POST /backup/export`: genera el volcado de la base de datos y devuelve el
+  flujo binario con las cabeceras `X-Checksum-SHA256`, `X-Size` y
+  `X-Format`.
+
+**Ejemplo de uso**
+
+```bash
+curl -H "Authorization: Bearer $TOKEN_BACKUP" http://localhost:5000/backup/capabilities
+curl -H "Authorization: Bearer $TOKEN_BACKUP" -o backup.sql http://localhost:5000/backup/export
+```
+
+Estos endpoints deben estar expuestos únicamente en la red interna y requieren
+que la imagen contenga la herramienta `pg_dump`.
+
 ## Comandos útiles en el Makefile
 
 - **make up**: Construye y levanta los contenedores en segundo plano.
