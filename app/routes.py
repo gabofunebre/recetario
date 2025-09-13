@@ -27,6 +27,16 @@ def admin_required(func):
     wrapper.__name__ = func.__name__
     return wrapper
 
+def backup_token_required(func):
+    def wrapper(*args, **kwargs):
+        token = request.headers.get('X-Backup-Token') or request.args.get('token')
+        expected = os.getenv('BACKUP_TOKEN')
+        if not expected or token != expected:
+            abort(401)
+        return func(*args, **kwargs)
+    wrapper.__name__ = func.__name__
+    return wrapper
+
 @main.route('/images/<path:filename>')
 def images(filename):
     return send_from_directory(current_app.config['IMAGE_UPLOADS'], filename)
@@ -41,6 +51,22 @@ def _get_uploaded_images():
     if not archivos:
         archivos = request.files.getlist('imagenes[]')
     return archivos
+
+@main.route('/backup/capabilities', methods=['GET'])
+@backup_token_required
+def backup_capabilities():
+    base_dir = os.path.abspath(os.path.join(current_app.root_path, '..', 'data', 'db'))
+    est_size = 0
+    for root, _, files in os.walk(base_dir):
+        for f in files:
+            est_size += os.path.getsize(os.path.join(root, f))
+    est_seconds = max(1, est_size // (1024 * 1024) + 1)
+    return jsonify({
+        "version": "v1",
+        "types": ["db"],
+        "est_seconds": est_seconds,
+        "est_size": est_size,
+    })
 
 # ----------------------- AUTENTICACIÓN -----------------------
 
