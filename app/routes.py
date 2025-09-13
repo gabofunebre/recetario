@@ -1,3 +1,4 @@
+
 from flask import (
     render_template,
     request,
@@ -15,14 +16,14 @@ from flask import (
 )
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
+import subprocess
+import hashlib
 from . import db
 from .models import Usuario, Receta, Ingrediente
 import json
 
 import os
-import hashlib
-import subprocess
-from functools import wraps
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -44,16 +45,6 @@ def admin_required(func):
     wrapper.__name__ = func.__name__
     return wrapper
 
-def backup_token_required(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        token = request.headers.get('X-Backup-Token')
-        expected = current_app.config.get('BACKUP_TOKEN') or os.getenv('BACKUP_TOKEN')
-        if not expected or token != expected:
-            return jsonify({'error': 'Token inválido'}), 403
-        return func(*args, **kwargs)
-    return wrapper
-
 @main.route('/images/<path:filename>')
 def images(filename):
     return send_from_directory(current_app.config['IMAGE_UPLOADS'], filename)
@@ -69,21 +60,60 @@ def _get_uploaded_images():
         archivos = request.files.getlist('imagenes[]')
     return archivos
 
+
+def backup_token_required(func):
+    """Verifica el token Bearer provisto para los respaldos."""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        auth = request.headers.get('Authorization', '')
+        expected = current_app.config.get('BACKUP_TOKEN')
+        if not expected or not auth.startswith('Bearer '):
+            return jsonify({"error": "Unauthorized"}), 401
+        token = auth.split(' ', 1)[1]
+        if token != expected:
+            return jsonify({"error": "Unauthorized"}), 401
+        return func(*args, **kwargs)
+    return wrapper
+
+
 @main.route('/backup/capabilities', methods=['GET'])
 @backup_token_required
 def backup_capabilities():
-    base_dir = os.path.abspath(os.path.join(current_app.root_path, '..', 'data', 'db'))
-    est_size = 0
-    for root, _, files in os.walk(base_dir):
-        for f in files:
-            est_size += os.path.getsize(os.path.join(root, f))
-    est_seconds = max(1, est_size // (1024 * 1024) + 1)
+    """Ficha técnica del respaldo disponible."""
     return jsonify({
         "version": "v1",
         "types": ["db"],
-        "est_seconds": est_seconds,
-        "est_size": est_size,
+        "est_seconds": 120,
+        "est_size": 104857600,
     })
+
+
+@main.route('/backup/export', methods=['POST'])
+@backup_token_required
+def backup_export():
+    """Genera y entrega el respaldo de la base de datos."""
+    db_url = current_app.config['SQLALCHEMY_DATABASE_URI']
+    try:
+        result = subprocess.run(['pg_dump', db_url], capture_output=True)
+    except FileNotFoundError:
+        return jsonify({"error": "pg_dump not found"}), 500
+
+    if result.returncode != 0:
+        current_app.logger.error(result.stderr.decode())
+        return jsonify({"error": "pg_dump failed"}), 500
+
+    data = result.stdout
+    checksum = hashlib.sha256(data).hexdigest()
+    size = len(data)
+
+    def generate():
+        yield data
+
+    response = Response(stream_with_context(generate()), mimetype='application/octet-stream')
+    response.headers['X-Checksum-SHA256'] = checksum
+    response.headers['X-Size'] = str(size)
+    response.headers['X-Format'] = 'sql'
+    return response
 
 # ----------------------- AUTENTICACIÓN -----------------------
 
@@ -130,6 +160,7 @@ def index():
     if not session.get('user_id'):
         return redirect(url_for('main.login'))
     return render_template('index.html')
+
 
 # Serialización de recetas para API
 def _serialize_receta(receta):

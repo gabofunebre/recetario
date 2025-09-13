@@ -77,29 +77,30 @@ Adicionalmente, las imágenes que suba la aplicación se almacenarán en
 Esta carpeta del host se monta en el contenedor como `/app/data/images`,
 asegurando que las imágenes persistan aunque se reinicie el servicio.
 Asegúrate de que la aplicación tenga permisos de escritura en `data/images/`.
+### Respaldo mediante orquestador
 
-### 5. Respaldo mediante orquestador
+La aplicación expone endpoints internos para que un orquestador solicite y
+suba respaldos automáticamente. Debes definir en un archivo `.env` el token
+`TOKEN_BACKUP`, que será leído por el servicio.
 
-El contenedor expone rutas internas para que un orquestador gestione respaldos de la base de datos.
-Los endpoints disponibles son:
+**Endpoints disponibles**
 
-- `GET /backup/capabilities` para consultar las capacidades de respaldo.
-- `GET /backup/export` para descargar un volcado de la base de datos.
+- `GET /backup/capabilities`: informa las capacidades de respaldo
+  (`{"version":"v1","types":["db"],"est_seconds":120,"est_size":104857600}`).
+- `POST /backup/export`: genera el volcado de la base de datos y devuelve el
+  flujo binario con las cabeceras `X-Checksum-SHA256`, `X-Size` y
+  `X-Format`.
 
-Todas las solicitudes deben incluir el encabezado `Authorization: Bearer <TOKEN>`.
-El token debe definirse en la variable de entorno `BACKUP_TOKEN` y se usan las variables
-de conexión a PostgreSQL (`PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`)
-para que `pg_dump` genere el respaldo. Este binario debe estar instalado en la imagen.
-
-Estas rutas solo están disponibles desde la red interna (por ejemplo `backups_net`);
-no se exponen a Internet.
-
-Ejemplo con `curl`:
+**Ejemplo de uso**
 
 ```bash
-curl -H "Authorization: Bearer $BACKUP_TOKEN" http://recetario:5000/backup/capabilities
-curl -H "Authorization: Bearer $BACKUP_TOKEN" http://recetario:5000/backup/export -o respaldo.sql
+curl -H "Authorization: Bearer $TOKEN_BACKUP" http://localhost:5000/backup/capabilities
+curl -H "Authorization: Bearer $TOKEN_BACKUP" -o backup.sql http://localhost:5000/backup/export
 ```
+
+Estos endpoints deben estar expuestos únicamente en la red interna y requieren
+que la imagen contenga la herramienta `pg_dump`.
+
 
 ## Comandos útiles en el Makefile
 
