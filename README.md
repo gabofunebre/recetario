@@ -78,6 +78,29 @@ Esta carpeta del host se monta en el contenedor como `/app/data/images`,
 asegurando que las imágenes persistan aunque se reinicie el servicio.
 Asegúrate de que la aplicación tenga permisos de escritura en `data/images/`.
 
+### 5. Respaldo mediante orquestador
+
+El contenedor expone rutas internas para que un orquestador gestione respaldos de la base de datos.
+Los endpoints disponibles son:
+
+- `GET /backup/capabilities` para consultar las capacidades de respaldo.
+- `GET /backup/export` para descargar un volcado de la base de datos.
+
+Todas las solicitudes deben incluir el encabezado `Authorization: Bearer <TOKEN>`.
+El token debe definirse en la variable de entorno `BACKUP_TOKEN` y se usan las variables
+de conexión a PostgreSQL (`PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`)
+para que `pg_dump` genere el respaldo. Este binario debe estar instalado en la imagen.
+
+Estas rutas solo están disponibles desde la red interna (por ejemplo `backups_net`);
+no se exponen a Internet.
+
+Ejemplo con `curl`:
+
+```bash
+curl -H "Authorization: Bearer $BACKUP_TOKEN" http://recetario:5000/backup/capabilities
+curl -H "Authorization: Bearer $BACKUP_TOKEN" http://recetario:5000/backup/export -o respaldo.sql
+```
+
 ## Comandos útiles en el Makefile
 
 - **make up**: Construye y levanta los contenedores en segundo plano.
