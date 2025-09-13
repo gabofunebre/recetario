@@ -17,7 +17,8 @@ services:
     restart: always
     networks:
       - recetario_net   # privada primero
-      - clouflared_net       # salida por túnel
+      - cloudflared_net       # salida por túnel
+      - backups_net
 
   db:
     image: postgres:15-alpine
@@ -38,7 +39,9 @@ services:
       - recetario_net
 
 networks:
-  clouflared_net:
+  backups_net:
+    external: true
+  cloudflared_net:
     external: true
   recetario_net:
     name: recetario_net
