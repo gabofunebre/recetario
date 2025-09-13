@@ -1,5 +1,6 @@
 services:
   recetario:
+    container_name: recetario
     build: .
     expose:
       - "5000"

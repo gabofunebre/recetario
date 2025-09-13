@@ -69,6 +69,22 @@ def _get_uploaded_images():
         archivos = request.files.getlist('imagenes[]')
     return archivos
 
+@main.route('/backup/capabilities', methods=['GET'])
+@backup_token_required
+def backup_capabilities():
+    base_dir = os.path.abspath(os.path.join(current_app.root_path, '..', 'data', 'db'))
+    est_size = 0
+    for root, _, files in os.walk(base_dir):
+        for f in files:
+            est_size += os.path.getsize(os.path.join(root, f))
+    est_seconds = max(1, est_size // (1024 * 1024) + 1)
+    return jsonify({
+        "version": "v1",
+        "types": ["db"],
+        "est_seconds": est_seconds,
+        "est_size": est_size,
+    })
+
 # ----------------------- AUTENTICACIÓN -----------------------
 
 @main.route('/login', methods=['GET', 'POST'])
