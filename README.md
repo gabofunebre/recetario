@@ -77,7 +77,6 @@ Adicionalmente, las imágenes que suba la aplicación se almacenarán en
 Esta carpeta del host se monta en el contenedor como `/app/data/images`,
 asegurando que las imágenes persistan aunque se reinicie el servicio.
 Asegúrate de que la aplicación tenga permisos de escritura en `data/images/`.
-
 ### Respaldo mediante orquestador
 
 La aplicación expone endpoints internos para que un orquestador solicite y
@@ -101,6 +100,7 @@ curl -H "Authorization: Bearer $TOKEN_BACKUP" -o backup.sql http://localhost:500
 
 Estos endpoints deben estar expuestos únicamente en la red interna y requieren
 que la imagen contenga la herramienta `pg_dump`.
+
 
 ## Comandos útiles en el Makefile
 
