@@ -14,15 +14,19 @@
   {% block head %}{% endblock %}
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+  <nav class="navbar navbar-expand-lg navbar-light app-navbar mb-4">
     <div class="container">
-      <a class="navbar-brand" href="{{ url_for('main.index') }}">Buscar Receta</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <a class="navbar-brand" href="{{ url_for('main.index') }}"><span class="brand-mark" aria-hidden="true"><i class="bi bi-journal-richtext"></i></span> Recetario</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Abrir navegación">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           {% if session.get('user_id') %}
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}"
+               href="{{ url_for('main.index') }}">Buscar receta</a>
+          </li>
           <li class="nav-item">
             <a class="nav-link {% if request.endpoint == 'main.crear_receta' %}active{% endif %}"
                href="{{ url_for('main.crear_receta') }}">Nueva Receta</a>
@@ -50,7 +54,7 @@
     </div>
   </nav>
 
-  <main class="container">
+  <main class="container app-main">
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         <div class="alert alert-info" role="alert">

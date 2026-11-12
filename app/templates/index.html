@@ -3,13 +3,25 @@
 {% block title %}Buscar recetas{% endblock %}
 
 {% block content %}
-  <div class="position-relative mb-3">
-    <input
-      type="text"
-      id="buscador"
-      class="form-control"
-      placeholder="Buscar receta..."
-    >
-    <div id="resultados" class="list-group position-absolute w-100 mt-1"></div>
+<section class="search-home" aria-labelledby="search-title">
+  <p class="eyebrow">TU RECETARIO DE SIEMPRE</p>
+  <h1 id="search-title">¿Qué cocinamos hoy?</h1>
+  <p class="search-intro">Encontrá esa receta que querés volver a preparar.</p>
+  <div class="search-panel">
+    <label for="buscador" class="form-label">Buscá por receta o ingrediente</label>
+    <div class="position-relative">
+      <i class="bi bi-search search-icon" aria-hidden="true"></i>
+      <input
+        type="text"
+        id="buscador"
+        class="form-control"
+        placeholder="Buscar receta..."
+        aria-describedby="search-help"
+      >
+      <div id="resultados" class="list-group position-absolute w-100 mt-1"></div>
+    </div>
+    <p id="search-help" class="search-help">También podés buscar por una palabra de la descripción.</p>
   </div>
+  <a class="browse-link" href="{{ url_for('main.ver_recetas') }}">Explorar todas las recetas <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+</section>
 {% endblock %}
