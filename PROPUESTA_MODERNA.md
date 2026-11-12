@@ -12,7 +12,9 @@ habituales de la aplicación.
 ## Alcance
 
 Solo cambia CSS y las plantillas base, inicio y login. El JavaScript del
-buscador, Fuse.js, los endpoints, los modelos y las dependencias se mantienen.
+buscador, Fuse.js, los endpoints y los modelos se mantienen.
+SQLAlchemy se fija en 2.0.46 para conservar el uso de psycopg2 con las URLs
+PostgreSQL existentes y evitar un fallo al reconstruir la imagen.
 No hay migraciones, cambios de esquema ni operaciones sobre los datos de uso.
 Tampoco se agregan servicios, fuentes externas ni bibliotecas.
 
